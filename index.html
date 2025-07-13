@@ -1,0 +1,3085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cromch</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --color-bad: #ff8c42;
+            --color-good: #4a90e2;
+            --color-bad-dark: #ff7a2a;
+            --color-good-dark: #3a7bd5;
+            --gradient-primary: linear-gradient(135deg, var(--color-good) 0%, #4a90e2 30%, #8e44ad 70%, var(--color-bad) 100%);
+            --gradient-primary-dark: linear-gradient(135deg, var(--color-good-dark) 0%, #3a7bd5 30%, #7b68ee 70%, var(--color-bad-dark) 100%);
+            --gradient-horizontal: linear-gradient(to right, var(--color-good) 0%, #4a90e2 30%, #8e44ad 70%, var(--color-bad) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            height: 100vh;
+        }
+
+        .main-area {
+            display: flex;
+            flex-direction: column;
+            background: #111;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1a1a1a;
+            padding: 16px 24px;
+            border-bottom: 1px solid #282828;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f0f0f0;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header h1:hover {
+            transform: scale(1.05);
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.4));
+        }
+
+        .header h1::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .header h1:hover::before {
+            left: 100%;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            border-radius: 1px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translateX(-50%);
+        }
+
+        .header h1:hover::after {
+            width: 100%;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
+        }
+
+        .image-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+            background: #0a0a0a;
+        }
+
+        .drop-zone {
+            position: absolute;
+            inset: 20px;
+            border: 2px dashed #333;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .drop-zone:hover {
+            border-color: #555;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .drop-zone.active {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.05);
+        }
+
+        .drop-zone.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .main-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .main-button::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 8px;
+            background: var(--gradient-primary);
+            z-index: -1;
+        }
+
+        .main-button::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: 7px;
+            background: #111;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+
+        .main-button:hover::after {
+            opacity: 0;
+        }
+
+        .main-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .quality-tabs {
+            display: flex;
+            margin: 16px 0 16px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .quality-tab {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .quality-tab.active {
+            color: #fff;
+            border-bottom-color: var(--color-good);
+        }
+
+        .quality-tab:hover:not(.active) {
+            color: #ccc;
+        }
+
+        .quality-control-2d {
+            width: 100%;
+            aspect-ratio: 1;
+            margin: 16px 0;
+            position: relative;
+            display: none;
+        }
+
+        .quality-control-2d.active {
+            display: block;
+        }
+
+        .quality-square {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #333;
+            border-radius: 8px;
+            position: relative;
+            background: 
+                radial-gradient(circle at 0% 100%, rgba(74, 144, 226, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 100% 0%, rgba(255, 140, 66, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 0% 0%, rgba(255, 140, 66, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255, 140, 66, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, 
+                    rgba(74, 144, 226, 0.02) 0%, 
+                    rgba(255, 255, 255, 0.01) 50%, 
+                    rgba(255, 140, 66, 0.02) 100%);
+            cursor: grab;
+            overflow: visible;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .quality-square:active {
+            cursor: grabbing;
+        }
+
+        .quality-square::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(to right, 
+                    rgba(74, 144, 226, 0.05) 0%, 
+                    rgba(255, 255, 255, 0.01) 50%, 
+                    rgba(255, 140, 66, 0.05) 100%),
+                linear-gradient(to bottom, 
+                    rgba(255, 140, 66, 0.05) 0%, 
+                    rgba(255, 255, 255, 0.01) 50%, 
+                    rgba(74, 144, 226, 0.05) 100%);
+            mix-blend-mode: overlay;
+        }
+
+        .quality-corner-label {
+            position: absolute;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .quality-corner-label.top-left {
+            top: 18px;
+            left: 18px;
+            color: var(--color-bad);
+        }
+
+        .quality-corner-label.top-right {
+            top: 18px;
+            right: 18px;
+            color: var(--color-bad);
+        }
+
+        .quality-corner-label.bottom-left {
+            bottom: 18px;
+            left: 18px;
+            color: var(--color-good);
+        }
+
+        .quality-corner-label.bottom-right {
+            bottom: 18px;
+            right: 18px;
+            color: var(--color-bad);
+        }
+
+        .quality-control-point {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--gradient-primary);
+            border: 3px solid #fff;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 4;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.1s ease-out;
+            transform: translate(-50%, -50%);
+        }
+
+        .quality-control-point:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .quality-control-point:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        .quality-grid {
+            position: absolute;
+            inset: 10px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .quality-grid-line {
+            position: absolute;
+            background: #fff;
+        }
+
+        .quality-grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            top: 0;
+        }
+
+        .quality-grid-line.horizontal {
+            height: 1px;
+            width: 100%;
+            left: 0;
+        }
+
+        .quality-sliders {
+            display: block;
+        }
+
+        .quality-sliders.hidden {
+            display: none;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drop-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .preview-container {
+            position: relative;
+            display: none;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .preview-container.active {
+            display: block;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .crop-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .crop-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .crop-overlay.active {
+            pointer-events: auto;
+        }
+
+        .crop-dark {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .crop-box {
+            position: absolute;
+            border: 2px solid #ff6b6b;
+            cursor: move;
+            display: none;
+        }
+
+        .crop-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            border: 2px solid #fff;
+            border-radius: 2px;
+        }
+
+        .crop-handle.nw { top: -6px; left: -6px; cursor: nw-resize; }
+        .crop-handle.ne { top: -6px; right: -6px; cursor: ne-resize; }
+        .crop-handle.sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+        .crop-handle.se { bottom: -6px; right: -6px; cursor: se-resize; }
+
+        .sidebar {
+            background: #1a1a1a;
+            border-left: 1px solid #282828;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #111;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #282828;
+            position: relative;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .button-section {
+            padding: 16px 20px;
+            border-bottom: 1px solid #282828;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .button-group-left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .button-group-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .button-small {
+            background: transparent;
+            color: #888;
+            border: 1px solid #333;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .button-small:hover:not(:disabled) {
+            background: #333;
+            color: #fff;
+        }
+
+        .button-small:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-small#resetBtn {
+            border-color: #8b2635;
+        }
+
+        .button-small#resetBtn:hover:not(:disabled) {
+            background: #8b2635;
+            color: #fff;
+        }
+
+        .controls {
+            padding: 0 20px 0 20px;
+            flex: 1;
+        }
+
+        .control-section {
+            margin: 15px 0 15px 0;
+            border-bottom: 1px solid #282828;
+        }
+
+        .control-section:last-child {
+            border-bottom: none;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-header {
+            margin-bottom: 10px;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #d0d0d0;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .control-quality-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .control-quality-labels span:first-child {
+            color: var(--color-good);
+        }
+
+        .control-quality-labels span:last-child {
+            color: var(--color-bad);
+        }
+
+        .control-value {
+            font-size: 0.85rem;
+            color: #ff6b6b;
+            font-weight: 500;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            --fill-percent: 100%;
+            background: linear-gradient(to right, 
+                var(--color-good) 0%, 
+                #4a90e2 calc(var(--fill-percent) * 0.3), 
+                #8e44ad calc(var(--fill-percent) * 0.7), 
+                var(--color-bad) var(--fill-percent), 
+                #2a2a2a var(--fill-percent), 
+                #2a2a2a 100%);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #333;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px 20px 20px;
+            gap: 12px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #333;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .toggle.active {
+            background: var(--gradient-primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(20px);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            flex: 1;
+            padding: 8px 12px;
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            background: #333;
+        }
+
+        .radio-option.active {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            color: #fff;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #252525;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: #d0d0d0;
+            transition: background 0.2s;
+        }
+
+        .collapsible-header:hover {
+            background: #2a2a2a;
+        }
+
+        .collapsible-arrow {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s;
+            opacity: 0.6;
+        }
+
+        .collapsible.active .collapsible-arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .collapsible-content.active {
+            max-height: 1000px;
+        }
+
+        .color-option.active {
+            border-color: #ff6b6b !important;
+            box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.3);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0 16px 0;
+        }
+
+        .preset-button {
+            flex: 1;
+            padding: 8px 12px;
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+        }
+
+        .preset-button:hover {
+            background: #333;
+            border-color: #444;
+        }
+
+
+
+        .preset-button i {
+            font-size: 1.1rem;
+        }
+
+        .preset-button.randomizer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-button.randomizer i:last-child {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .preset-button.randomizer:hover i:first-child {
+            opacity: 0;
+        }
+
+        .preset-button.randomizer:hover i:last-child {
+            opacity: 1;
+        }
+
+        .preset-button.randomizer.rolling i:last-child {
+            animation: rollDice 0.2s ease-out;
+        }
+
+        @keyframes rollDice {
+            0% {
+                transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateY(-8px) rotate(180deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) translateY(0) rotate(360deg);
+            }
+        }
+
+        .text-layer {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .text-layer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .text-layer-header:hover {
+            background: #2a2a2a;
+        }
+
+        .text-layer-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #d0d0d0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-layer-arrow {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s;
+            opacity: 0.6;
+        }
+
+        .text-layer.collapsed .text-layer-arrow {
+            transform: rotate(-90deg);
+        }
+
+        .text-layer-remove {
+            background: transparent;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-layer-remove:hover {
+            background: rgba(255, 107, 107, 0.1);
+            transform: scale(1.1);
+        }
+
+        .text-layer-remove i {
+            font-size: 1.1rem;
+        }
+
+        .text-layer-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 16px 16px 16px;
+        }
+
+        .text-layer.collapsed .text-layer-content {
+            max-height: 0;
+            padding: 0 16px 0 16px;
+        }
+
+        .motion-blur-control {
+            width: 100%;
+            aspect-ratio: 1;
+            margin: 8px 0;
+        }
+
+        .motion-blur-circle {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #333;
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 50%, transparent 100%);
+            cursor: grab;
+            overflow: hidden;
+        }
+
+        .motion-blur-circle:active {
+            cursor: grabbing;
+        }
+
+        .motion-blur-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: #666;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+
+        .motion-blur-point {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background: var(--gradient-primary);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            z-index: 4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease-out;
+        }
+
+        .motion-blur-point:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .motion-blur-point:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        .motion-blur-trail {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 0;
+            background: linear-gradient(to bottom, var(--color-good), transparent);
+            transform-origin: top center;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            opacity: 0.6;
+        }
+
+        .info-box {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 14px;
+            margin: 20px;
+            font-size: 0.85rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            color: #ff6b6b;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            padding: 20px;
+            border-top: 1px solid #282828;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .button.primary {
+            background: #111;
+            color: #fff;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .button.primary::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 8px;
+            background: var(--gradient-primary);
+            z-index: -1;
+        }
+
+        .button.primary::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: 7px;
+            background: #111;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+
+        .button.primary:hover::after {
+            opacity: 0;
+        }
+
+        .button.primary:hover {
+            transform: translateY(-1px);
+        }
+
+        .button.secondary {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .button.secondary:hover {
+            background: #333;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .crop-confirm {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 10px;
+            padding: 16px;
+            background: rgba(26, 26, 26, 0.95);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+        }
+
+        .crop-confirm.active {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+                height: 100vh;
+            }
+
+            .main-area {
+                min-height: 0; /* Allow flex child to shrink */
+                display: flex;
+                flex-direction: column;
+            }
+
+            .image-area {
+                flex: 1;
+                min-height: 0; /* Allow flex child to shrink */
+                padding: 10px;
+            }
+
+            .preview-container {
+                max-width: 100%;
+                max-height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .preview-image {
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+            }
+
+            .drop-zone {
+                inset: 10px;
+            }
+
+            .sidebar {
+                border-left: none;
+                border-top: 1px solid #282828;
+                max-height: 50vh;
+                min-height: 200px;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .sidebar-header {
+                padding: 16px;
+            }
+
+            .controls {
+                padding: 16px;
+            }
+
+            .motion-blur-control {
+                max-width: 200px;
+                margin: 8px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="main-area">
+            <div class="header">
+                <h1>Cromch</h1>
+                <div id="uploadInfo" style="font-size: 0.85rem; color: #666;"></div>
+            </div>
+            
+            <div class="image-area">
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" accept="image/*">
+                    <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 16V7m0 0l3 3m-3-3l-3 3M2 16a6 6 0 0 1 6-6h1m11 6a6 6 0 0 0-6-6h-1m0 0V4"></path>
+                    </svg>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Drop your image here</h3>
+                    <p style="color: #666; font-size: 0.9rem;">or click to browse • paste from clipboard</p>
+                    <button class="main-button" id="mainBtn">Load Example Image</button>
+                </div>
+                
+                <div class="preview-container" id="previewContainer">
+                    <div class="crop-container" id="cropContainer">
+                        <img id="previewImage" class="preview-image">
+                        <div class="crop-overlay" id="cropOverlay">
+                            <div class="crop-dark" id="cropDarkTop"></div>
+                            <div class="crop-dark" id="cropDarkLeft"></div>
+                            <div class="crop-dark" id="cropDarkRight"></div>
+                            <div class="crop-dark" id="cropDarkBottom"></div>
+                            <div class="crop-box" id="cropBox">
+                                <div class="crop-handle nw"></div>
+                                <div class="crop-handle ne"></div>
+                                <div class="crop-handle sw"></div>
+                                <div class="crop-handle se"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="crop-confirm" id="cropConfirm">
+                    <button class="button secondary" id="cancelCrop">Cancel</button>
+                    <button class="button primary" id="applyCrop">Apply Crop</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Image Settings</h2>
+            </div>
+            
+            <div class="button-section">
+                <div class="button-group">
+                    <div class="button-group-left">
+                        <h3 style="font-size: 1rem; font-weight: 600; color: #d0d0d0; margin: 0;">History</h3>
+                    </div>
+                    <div class="button-group-right">
+                        <button class="button-small" id="undoBtn" disabled>Undo</button>
+                        <button class="button-small" id="redoBtn" disabled>Redo</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <div class="toggle-group">
+                    <h3 style="font-size: 1rem; font-weight: 600; color: #d0d0d0; margin: 0;">Crop Image</h3>
+                    <div class="toggle" id="cropToggle"></div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                
+                <div class="control-section">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #d0d0d0;">Quality Settings</h3>
+                    
+                    <label class="control-label">Presets</label>
+                    <div class="preset-buttons">
+                        <button class="preset-button reset" id="resetBtn">
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                        <button class="preset-button" id="preset1">1</button>
+                        <button class="preset-button" id="preset2">2</button>
+                        <button class="preset-button" id="preset3">3</button>
+                        <button class="preset-button randomizer" id="randomizer">
+                            <i class="ri-dice-line"></i>
+                            <i class="ri-dice-fill"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="quality-tabs">
+                        <button class="quality-tab active" id="sliderTab">Sliders</button>
+                        <button class="quality-tab" id="controlTab">2D Control</button>
+                    </div>
+                    
+                    <div class="quality-sliders" id="qualitySliders">
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">JPEG Quality</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="quality" min="1" max="20" value="1">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">WEBP Artifacts</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="webp" min="1" max="10" value="1">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">GIF Artifacts</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="gif" min="1" max="20" value="1">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">Image Scale</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="scale" min="5" max="100" step="5" value="5">
+                        </div>
+                    </div>
+                    
+                    <div class="quality-control-2d" id="qualityControl2D">
+                        <div class="quality-square" id="qualitySquare">
+                            <div class="quality-grid">
+                                <div class="quality-grid-line vertical" style="left: 25%"></div>
+                                <div class="quality-grid-line vertical" style="left: 50%"></div>
+                                <div class="quality-grid-line vertical" style="left: 75%"></div>
+                                <div class="quality-grid-line horizontal" style="top: 25%"></div>
+                                <div class="quality-grid-line horizontal" style="top: 50%"></div>
+                                <div class="quality-grid-line horizontal" style="top: 75%"></div>
+                            </div>
+                            <div class="quality-corner-label top-left">Awful</div>
+                            <div class="quality-corner-label top-right">Why?</div>
+                            <div class="quality-corner-label bottom-left">Best</div>
+                            <div class="quality-corner-label bottom-right">Bad</div>
+                            <div class="quality-control-point" id="qualityControlPoint"></div>
+                        </div>
+                        <div style="margin-top: 12px; font-size: 0.8rem; color: #666; text-align: center;">
+                            <div style="margin-bottom: 4px;">
+                                <strong>X-axis:</strong> JPEG Quality • GIF Artifacts
+                            </div>
+                            <div>
+                                <strong>Y-axis:</strong> WEBP Artifacts • Image Scale
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <div class="collapsible" id="styleCollapsible">
+                        <div class="collapsible-header">
+                            <span id="collapsibleText">Show Adjustments</span>
+                            <svg class="collapsible-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="collapsible-content" id="styleContent">
+                        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #d0d0d0;">Adjustment Settings</h3>
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">Saturation</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="saturation" min="0" max="200" value="100">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">Contrast</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="contrast" min="50" max="200" value="100">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">Brightness</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="brightness" min="50" max="150" value="100">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">Sharpness</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="sharpness" min="0" max="10" value="0">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">Noise</label>
+                                <div class="control-quality-labels">
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                                </div>
+                            </div>
+                            <input type="range" class="slider" id="noise" min="0" max="50" value="0">
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <label class="control-label">Motion Blur</label>
+                                <div class="control-quality-labels">
+                                    <span>Max</span>
+                                    <span>None</span>
+                                </div>
+                            </div>
+                            <div class="motion-blur-control" id="motionBlurControl">
+                                <div class="motion-blur-circle">
+                                    <div class="motion-blur-center"></div>
+                                    <div class="motion-blur-point" id="motionBlurPoint"></div>
+                                    <div class="motion-blur-trail" id="motionBlurTrail"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <div class="text-layers-container" id="textLayersContainer">
+                        <!-- Text layers will be dynamically added here -->
+                    </div>
+                    
+                    <div class="control-group" style="margin-top: 16px;">
+                        <button class="button secondary" id="addTextLayerBtn" style="width: 100%; display: flex; align-items: center; justify-content: flex-start; gap: 8px; padding-left: 16px;">
+                            <i class="ri-add-circle-line"></i>
+                            Add Text Layer
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+
+            
+            <div class="info-box" id="infoBox" style="display: none;">
+                <div class="info-row">
+                    <span class="info-label">Resolution</span>
+                    <span class="info-value" id="infoResolution">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">File Size</span>
+                    <span class="info-value" id="infoFileSize">-</span>
+                </div>
+                <div class="info-row" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #333;">
+                    <span class="info-label">Show Original</span>
+                    <div class="toggle" id="originalToggle" style="width: 36px; height: 20px;"></div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="button primary" id="downloadBtn" disabled>Download JPG</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let originalImage = null;
+        let currentBlob = null;
+        let cropEnabled = false;
+        let cropData = { x: 0, y: 0, width: 0, height: 0 };
+        let appliedCropData = null;
+        let isDragging = false;
+        let isResizing = false;
+        let dragStart = { x: 0, y: 0 };
+        let resizeHandle = null;
+        let scalingAlgorithm = 'nearest';
+        
+        // Motion blur variables
+        let motionBlur = { x: 0, y: 0, strength: 0 };
+        let isMotionBlurDragging = false;
+        
+        // Quality control variables
+        let qualityControl2DActive = false;
+        let qualityControlPosition = { x: 0, y: 0 }; // 0,0 = bottom-left (best quality)
+        let isQualityControlDragging = false;
+        let slidersModifiedSince2D = false; // Track if sliders changed since last 2D interaction
+        let isShowingOriginal = false; // Track if showing original image preview
+
+        // Undo/Redo system
+        let settingsHistory = [];
+        let historyIndex = -1;
+        let isRestoringState = false;
+
+        // Text layers variables
+        let textLayers = [];
+        let nextLayerId = 1;
+
+        // DOM elements
+        const logoTitle = document.querySelector('.header h1');
+        const dropZone = document.getElementById('dropZone');
+        const mainBtn = document.getElementById('mainBtn');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const cropOverlay = document.getElementById('cropOverlay');
+        const cropBox = document.getElementById('cropBox');
+        const cropConfirm = document.getElementById('cropConfirm');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const cropToggle = document.getElementById('cropToggle');
+        const infoBox = document.getElementById('infoBox');
+        const styleCollapsible = document.getElementById('styleCollapsible');
+        const styleContent = document.getElementById('styleContent');
+        const collapsibleText = document.getElementById('collapsibleText');
+        
+        // Text layers elements
+        const textLayersContainer = document.getElementById('textLayersContainer');
+        const addTextLayerBtn = document.getElementById('addTextLayerBtn');
+        
+        // Preset elements
+        const preset1Btn = document.getElementById('preset1');
+        const preset2Btn = document.getElementById('preset2');
+        const preset3Btn = document.getElementById('preset3');
+        const randomizerBtn = document.getElementById('randomizer');
+        
+        // Crop confirm buttons
+        const applyCropBtn = document.getElementById('applyCrop');
+        const cancelCropBtn = document.getElementById('cancelCrop');
+        
+        // Motion blur elements
+        const motionBlurControl = document.getElementById('motionBlurControl');
+        const motionBlurPoint = document.getElementById('motionBlurPoint');
+        const motionBlurTrail = document.getElementById('motionBlurTrail');
+        
+        // Quality control elements
+        const sliderTab = document.getElementById('sliderTab');
+        const controlTab = document.getElementById('controlTab');
+        const qualitySliders = document.getElementById('qualitySliders');
+        const qualityControl2D = document.getElementById('qualityControl2D');
+        const qualitySquare = document.getElementById('qualitySquare');
+        const qualityControlPoint = document.getElementById('qualityControlPoint');
+
+        // Info elements
+        const infoResolution = document.getElementById('infoResolution');
+        const infoFileSize = document.getElementById('infoFileSize');
+        const originalToggle = document.getElementById('originalToggle');
+
+        // Sliders
+        const sliders = {
+            quality: document.getElementById('quality'),
+            webp: document.getElementById('webp'),
+            gif: document.getElementById('gif'),
+            saturation: document.getElementById('saturation'),
+            contrast: document.getElementById('contrast'),
+            brightness: document.getElementById('brightness'),
+            sharpness: document.getElementById('sharpness'),
+            noise: document.getElementById('noise'),
+            scale: document.getElementById('scale')
+        };
+
+
+
+        // Style collapsible
+        styleCollapsible.addEventListener('click', () => {
+            styleCollapsible.classList.toggle('active');
+            styleContent.classList.toggle('active');
+            collapsibleText.textContent = styleCollapsible.classList.contains('active') ? 'Hide Adjustments' : 'Show Adjustments';
+        });
+
+
+
+        // Add text layer button
+        addTextLayerBtn.addEventListener('click', () => {
+            addTextLayer();
+        });
+
+        // Logo click to refresh page
+        logoTitle.addEventListener('click', () => {
+            window.location.reload();
+        });
+
+        // Original image toggle
+        originalToggle.addEventListener('click', () => {
+            isShowingOriginal = !isShowingOriginal;
+            originalToggle.classList.toggle('active');
+            
+            if (originalImage) {
+                if (isShowingOriginal) {
+                    processOriginalPreview();
+                } else {
+                    processImage();
+                }
+            }
+        });
+
+        // Example image button
+        mainBtn.addEventListener('click', () => {
+            loadExampleImage();
+        });
+
+        // Load example image from URL
+        async function loadExampleImage() {
+            try {
+                const response = await fetch('https://dn721802.ca.archive.org/0/items/cheesy_202401/cheesy.jpg');
+                const blob = await response.blob();
+                handleImageFile(blob);
+            } catch (error) {
+                console.error('Failed to load example image:', error);
+                alert('Failed to load example image. Please try uploading your own image.');
+            }
+        }
+
+        // Quality mapping functions (flipped: left=good, right=bad)
+        function mapQualityValue(sliderValue) {
+            // 20-step slider: positions 1-19 = 99-1%, position 20 = 1%
+            const flipped = 21 - sliderValue;
+            return flipped === 20 ? 100 : flipped;
+        }
+
+        function mapWebpValue(sliderValue) {
+            // 10-step slider: positions 1-9 = 99-1%, position 10 = 1%
+            const flipped = 11 - sliderValue;
+            return flipped === 10 ? 100 : flipped;
+        }
+
+        function mapGifValue(sliderValue) {
+            // 20-step slider: positions 1-19 = 99-1%, position 20 = 1%
+            const flipped = 21 - sliderValue;
+            return flipped === 20 ? 100 : flipped + 1;
+        }
+
+        function mapScaleValue(sliderValue) {
+            // Scale slider: flip so left=100% (good), right=5% (bad)
+            return 105 - sliderValue;
+        }
+
+        // Quality presets (using flipped slider values: left=good, right=bad)
+        const qualityPresets = {
+            1: { // High Quality
+                quality: 1,    // Best JPEG quality
+                webp: 1,       // Best WEBP quality  
+                gif: 1,        // Best GIF quality
+                scale: 5       // 100% scale
+            },
+            2: { // Medium Quality
+                quality: 10,   // Medium JPEG quality
+                webp: 5,       // Medium WEBP quality
+                gif: 10,       // Medium GIF quality
+                scale: 25      // 80% scale
+            },
+            3: { // Low Quality
+                quality: 18,   // Low JPEG quality
+                webp: 8,       // Low WEBP quality
+                gif: 18,       // Low GIF quality
+                scale: 70      // 35% scale
+            }
+        };
+
+        function applyPreset(presetNumber) {
+            const preset = qualityPresets[presetNumber];
+            if (!preset) return;
+
+            // Apply preset values
+            sliders.quality.value = preset.quality;
+            sliders.webp.value = preset.webp;
+            sliders.gif.value = preset.gif;
+            sliders.scale.value = preset.scale;
+
+            // Update slider fills
+            updateSliderFill(sliders.quality);
+            updateSliderFill(sliders.webp);
+            updateSliderFill(sliders.gif);
+            updateSliderFill(sliders.scale);
+
+            // Update 2D control if needed
+            if (qualityControl2DActive) {
+                updateControlPointFromSliders();
+                slidersModifiedSince2D = false;
+            } else {
+                slidersModifiedSince2D = true;
+            }
+
+            // Process image and save state
+            if (originalImage && !isShowingOriginal) {
+                processImage();
+            }
+            saveSettingsState();
+        }
+
+        function randomizeQuality() {
+            // Add rolling animation
+            const randomizerBtn = document.getElementById('randomizer');
+            randomizerBtn.classList.add('rolling');
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                randomizerBtn.classList.remove('rolling');
+            }, 200);
+
+            // Generate random values for quality sliders
+            sliders.quality.value = Math.floor(Math.random() * 20) + 1;   // 1-20
+            sliders.webp.value = Math.floor(Math.random() * 10) + 1;      // 1-10
+            sliders.gif.value = Math.floor(Math.random() * 20) + 1;       // 1-20
+            sliders.scale.value = Math.floor(Math.random() * 19) * 5 + 5; // 5-100 (step 5)
+
+            // Update slider fills
+            updateSliderFill(sliders.quality);
+            updateSliderFill(sliders.webp);
+            updateSliderFill(sliders.gif);
+            updateSliderFill(sliders.scale);
+
+            // Update 2D control if needed
+            if (qualityControl2DActive) {
+                updateControlPointFromSliders();
+                slidersModifiedSince2D = false;
+            } else {
+                slidersModifiedSince2D = true;
+            }
+
+            // Process image and save state
+            if (originalImage && !isShowingOriginal) {
+                processImage();
+            }
+            saveSettingsState();
+        }
+
+        // Function to update slider fill
+        function updateSliderFill(slider) {
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            const value = parseFloat(slider.value);
+            const percent = ((value - min) / (max - min)) * 100;
+            slider.style.setProperty('--fill-percent', percent + '%');
+        }
+
+        // Update value displays and slider fills
+        Object.keys(sliders).forEach(key => {
+            // Set initial fill
+            updateSliderFill(sliders[key]);
+            
+            // Update display and process image while dragging
+            sliders[key].addEventListener('input', (e) => {
+                updateSliderFill(e.target);
+                if (originalImage && !isShowingOriginal) {
+                    processImage();
+                }
+                
+                // No real-time 2D update - only update when switching to 2D view
+            });
+            
+            // Save state only when user releases the slider
+            sliders[key].addEventListener('change', (e) => {
+                // Mark that sliders have been modified since last 2D interaction
+                if (['quality', 'webp', 'gif', 'scale'].includes(key)) {
+                    slidersModifiedSince2D = true;
+                }
+                
+                if (originalImage) {
+                    saveSettingsState();
+                }
+            });
+        });
+
+
+
+        // Quality preset event listeners
+        preset1Btn.addEventListener('click', () => applyPreset(1));
+        preset2Btn.addEventListener('click', () => applyPreset(2));
+        preset3Btn.addEventListener('click', () => applyPreset(3));
+        randomizerBtn.addEventListener('click', () => randomizeQuality());
+
+        // Text layer functions
+        function createTextLayer(id, name) {
+            return {
+                id: id,
+                name: name,
+                text: '',
+                fontSize: 24,
+                color: '#ffffff',
+                x: 50,
+                y: 50,
+                rotation: 0
+            };
+        }
+
+        function addTextLayer() {
+            const layer = createTextLayer(nextLayerId, `Text ${nextLayerId}`);
+            textLayers.push(layer);
+            nextLayerId++;
+            
+            renderTextLayers();
+            
+            if (originalImage && !isShowingOriginal) {
+                processImage();
+            }
+            saveSettingsState();
+        }
+
+        function removeTextLayer(layerId) {
+            textLayers = textLayers.filter(layer => layer.id !== layerId);
+            renderTextLayers();
+            
+            if (originalImage && !isShowingOriginal) {
+                processImage();
+            }
+            saveSettingsState();
+        }
+
+        function renderTextLayers() {
+            textLayersContainer.innerHTML = '';
+            
+            textLayers.forEach(layer => {
+                const layerElement = document.createElement('div');
+                layerElement.className = 'text-layer';
+                layerElement.innerHTML = `
+                    <div class="text-layer-header">
+                        <span class="text-layer-title">
+                            <svg class="text-layer-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            ${layer.name}
+                        </span>
+                        <button class="text-layer-remove" onclick="removeTextLayer(${layer.id})">
+                            <i class="ri-indeterminate-circle-line"></i>
+                        </button>
+                    </div>
+                    <div class="text-layer-content">
+                        <div class="control-group">
+                            <label class="control-label">Text Content</label>
+                            <input type="text" class="text-input" data-layer="${layer.id}" placeholder="Enter your text..." 
+                                   value="${layer.text}" style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid #333; border-radius: 4px; color: #fff; font-size: 0.9rem;">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Font Size</label>
+                            <input type="range" class="slider text-font-size" data-layer="${layer.id}" min="12" max="100" value="${layer.fontSize}">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Text Color</label>
+                            <div class="color-options" style="display: flex; gap: 8px; margin-top: 8px;">
+                                <div class="color-option ${layer.color === '#ffffff' ? 'active' : ''}" data-color="#ffffff" data-layer="${layer.id}" style="width: 30px; height: 30px; background: #ffffff; border: 2px solid #666; border-radius: 4px; cursor: pointer;"></div>
+                                <div class="color-option ${layer.color === '#000000' ? 'active' : ''}" data-color="#000000" data-layer="${layer.id}" style="width: 30px; height: 30px; background: #000000; border: 2px solid #666; border-radius: 4px; cursor: pointer;"></div>
+                                <div class="color-option ${layer.color === '#ff6b6b' ? 'active' : ''}" data-color="#ff6b6b" data-layer="${layer.id}" style="width: 30px; height: 30px; background: #ff6b6b; border: 2px solid #666; border-radius: 4px; cursor: pointer;"></div>
+                                <div class="color-option ${layer.color === '#4ecdc4' ? 'active' : ''}" data-color="#4ecdc4" data-layer="${layer.id}" style="width: 30px; height: 30px; background: #4ecdc4; border: 2px solid #666; border-radius: 4px; cursor: pointer;"></div>
+                                <div class="color-option ${layer.color === '#45b7d1' ? 'active' : ''}" data-color="#45b7d1" data-layer="${layer.id}" style="width: 30px; height: 30px; background: #45b7d1; border: 2px solid #666; border-radius: 4px; cursor: pointer;"></div>
+                                <div class="color-option ${layer.color === '#f9ca24' ? 'active' : ''}" data-color="#f9ca24" data-layer="${layer.id}" style="width: 30px; height: 30px; background: #f9ca24; border: 2px solid #666; border-radius: 4px; cursor: pointer;"></div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Horizontal Position</label>
+                            <input type="range" class="slider text-x" data-layer="${layer.id}" min="0" max="100" value="${layer.x}">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Vertical Position</label>
+                            <input type="range" class="slider text-y" data-layer="${layer.id}" min="0" max="100" value="${layer.y}">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Rotation</label>
+                            <input type="range" class="slider text-rotation" data-layer="${layer.id}" min="0" max="360" value="${layer.rotation}">
+                        </div>
+                    </div>
+                `;
+                
+                textLayersContainer.appendChild(layerElement);
+                
+                // Add event listeners for this layer
+                setupTextLayerEvents(layerElement, layer);
+            });
+        }
+
+        function setupTextLayerEvents(layerElement, layer) {
+            // Layer header click for collapsing
+            const layerHeader = layerElement.querySelector('.text-layer-header');
+            layerHeader.addEventListener('click', (e) => {
+                // Don't collapse if clicking the remove button
+                if (e.target.closest('.text-layer-remove')) {
+                    return;
+                }
+                layerElement.classList.toggle('collapsed');
+            });
+            
+            // Text input
+            const textInput = layerElement.querySelector('.text-input');
+            textInput.addEventListener('input', (e) => {
+                layer.text = e.target.value;
+                if (originalImage && !isShowingOriginal) {
+                    processImage();
+                }
+            });
+            
+            textInput.addEventListener('change', () => {
+                if (originalImage) {
+                    saveSettingsState();
+                }
+            });
+            
+            // Font size slider
+            const fontSizeSlider = layerElement.querySelector('.text-font-size');
+            updateSliderFill(fontSizeSlider);
+            fontSizeSlider.addEventListener('input', (e) => {
+                layer.fontSize = parseInt(e.target.value);
+                updateSliderFill(e.target);
+                if (originalImage && !isShowingOriginal) {
+                    processImage();
+                }
+            });
+            
+            fontSizeSlider.addEventListener('change', () => {
+                if (originalImage) {
+                    saveSettingsState();
+                }
+            });
+            
+            // Position and rotation sliders
+            ['text-x', 'text-y', 'text-rotation'].forEach(className => {
+                const slider = layerElement.querySelector('.' + className);
+                updateSliderFill(slider);
+                slider.addEventListener('input', (e) => {
+                    const value = parseInt(e.target.value);
+                    if (className === 'text-x') {
+                        layer.x = value;
+                    } else if (className === 'text-y') {
+                        layer.y = value;
+                    } else if (className === 'text-rotation') {
+                        layer.rotation = value;
+                    }
+                    updateSliderFill(e.target);
+                    if (originalImage && !isShowingOriginal) {
+                        processImage();
+                    }
+                });
+                
+                slider.addEventListener('change', () => {
+                    if (originalImage) {
+                        saveSettingsState();
+                    }
+                });
+            });
+            
+            // Color options
+            const colorOptions = layerElement.querySelectorAll('.color-option');
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    layer.color = option.dataset.color;
+                    if (originalImage && !isShowingOriginal) {
+                        processImage();
+                    }
+                    saveSettingsState();
+                });
+            });
+        }
+
+
+
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('active');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('active');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                handleImageFile(files[0]);
+            }
+        });
+
+        // File input
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageFile(e.target.files[0]);
+            }
+        });
+
+        // Paste event
+        document.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();
+                    handleImageFile(blob);
+                    break;
+                }
+            }
+        });
+
+        // Motion blur drag functionality
+        function updateMotionBlurTrail() {
+            const distance = Math.sqrt(motionBlur.x * motionBlur.x + motionBlur.y * motionBlur.y);
+            const angle = Math.atan2(motionBlur.y, motionBlur.x) * (180 / Math.PI) + 90;
+            
+            motionBlurTrail.style.height = distance + 'px';
+            motionBlurTrail.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+            motionBlur.strength = Math.min(distance / 100, 1); // Normalize to 0-1
+        }
+
+        motionBlurPoint.addEventListener('mousedown', (e) => {
+            isMotionBlurDragging = true;
+            e.preventDefault();
+        });
+
+        motionBlurControl.addEventListener('mousedown', (e) => {
+            if (e.target === motionBlurControl.querySelector('.motion-blur-circle')) {
+                isMotionBlurDragging = true;
+                const rect = motionBlurControl.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                motionBlur.x = e.clientX - centerX;
+                motionBlur.y = e.clientY - centerY;
+                
+                // Constrain to circle
+                const distance = Math.sqrt(motionBlur.x * motionBlur.x + motionBlur.y * motionBlur.y);
+                const maxDistance = (rect.width / 2) - 10;
+                if (distance > maxDistance) {
+                    motionBlur.x = (motionBlur.x / distance) * maxDistance;
+                    motionBlur.y = (motionBlur.y / distance) * maxDistance;
+                }
+                
+                motionBlurPoint.style.left = `calc(50% + ${motionBlur.x}px)`;
+                motionBlurPoint.style.top = `calc(50% + ${motionBlur.y}px)`;
+                updateMotionBlurTrail();
+                
+                if (originalImage && !isShowingOriginal) processImage();
+                if (originalImage) saveSettingsState();
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isMotionBlurDragging) {
+                const rect = motionBlurControl.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                motionBlur.x = e.clientX - centerX;
+                motionBlur.y = e.clientY - centerY;
+                
+                // Constrain to circle
+                const distance = Math.sqrt(motionBlur.x * motionBlur.x + motionBlur.y * motionBlur.y);
+                const maxDistance = (rect.width / 2) - 10;
+                if (distance > maxDistance) {
+                    motionBlur.x = (motionBlur.x / distance) * maxDistance;
+                    motionBlur.y = (motionBlur.y / distance) * maxDistance;
+                }
+                
+                motionBlurPoint.style.left = `calc(50% + ${motionBlur.x}px)`;
+                motionBlurPoint.style.top = `calc(50% + ${motionBlur.y}px)`;
+                updateMotionBlurTrail();
+                
+                if (originalImage && !isShowingOriginal) processImage();
+                if (originalImage) saveSettingsState();
+            }
+        });
+
+        // Crop toggle
+        cropToggle.addEventListener('click', () => {
+            // Prevent cropping if no image is loaded
+            if (!originalImage) {
+                return;
+            }
+            
+            cropEnabled = !cropEnabled;
+            cropToggle.classList.toggle('active');
+            
+            if (cropEnabled) {
+                // If there was a previous crop, reset it when starting new crop
+                if (appliedCropData) {
+                    appliedCropData = null;
+                    processImage();
+                }
+                enableCropping();
+            } else {
+                disableCropping();
+            }
+            saveSettingsState();
+        });
+
+        // Quality control tab switching
+        sliderTab.addEventListener('click', () => {
+            qualityControl2DActive = false;
+            sliderTab.classList.add('active');
+            controlTab.classList.remove('active');
+            qualitySliders.classList.remove('hidden');
+            qualityControl2D.classList.remove('active');
+        });
+
+        controlTab.addEventListener('click', () => {
+            qualityControl2DActive = true;
+            controlTab.classList.add('active');
+            sliderTab.classList.remove('active');
+            qualitySliders.classList.add('hidden');
+            qualityControl2D.classList.add('active');
+            
+            // Only update control point position from sliders if they've been modified
+            if (slidersModifiedSince2D) {
+                setTimeout(() => {
+                    updateControlPointFromSliders();
+                    slidersModifiedSince2D = false; // Reset flag after updating
+                }, 100);
+            } else {
+                // Just update the visual position without recalculating
+                setTimeout(() => {
+                    updateQualityControlPoint();
+                }, 100);
+            }
+        });
+
+        // Initialize quality control point position
+        function updateControlPointFromSliders() {
+            // Map slider values to 2D position
+            // X-axis: average of JPEG quality (inverted) and GIF artifacts (inverted)
+            const jpegNormalized = 1 - (mapQualityValue(sliders.quality.value) / 100);
+            const gifNormalized = 1 - (mapGifValue(sliders.gif.value) / 100);
+            
+            // Y-axis: average of WEBP artifacts (inverted) and Image scale (inverted)
+            const webpNormalized = 1 - (mapWebpValue(sliders.webp.value) / 100);
+            const scaleNormalized = 1 - (mapScaleValue(sliders.scale.value) / 100);
+            
+            qualityControlPosition.x = (jpegNormalized + gifNormalized) / 2;
+            qualityControlPosition.y = (webpNormalized + scaleNormalized) / 2;
+            
+            updateQualityControlPoint();
+        }
+
+        function updateQualityControlPoint() {
+            const rect = qualitySquare.getBoundingClientRect();
+            const padding = 10; // Match CSS padding
+            const size = rect.width - (padding * 2);
+            
+            // Ensure the element has proper dimensions
+            if (rect.width <= 0 || rect.height <= 0) {
+                return;
+            }
+            
+            // Convert position (0-1) to pixel coordinates within the padded area
+            // Note: y is inverted because 0,0 should be bottom-left
+            const x = padding + (qualityControlPosition.x * size);
+            const y = padding + ((1 - qualityControlPosition.y) * size);
+            
+            qualityControlPoint.style.left = x + 'px';
+            qualityControlPoint.style.top = y + 'px';
+        }
+
+        function updateSlidersFromControl() {
+            // Temporarily prevent slider change events from setting the modified flag
+            const originalFlag = slidersModifiedSince2D;
+            slidersModifiedSince2D = false;
+            
+            // Map 2D position back to slider values (flipped sliders)
+            // X-axis affects JPEG quality and GIF artifacts
+            const jpegValue = Math.round(1 + (qualityControlPosition.x * 19)); // 1 = best, 20 = worst
+            const gifValue = Math.round(1 + (qualityControlPosition.x * 19)); // 1 = best, 20 = worst
+            
+            // Y-axis affects WEBP artifacts and Image scale
+            const webpValue = Math.round(1 + (qualityControlPosition.y * 9)); // 1 = best, 10 = worst
+            const scaleValue = Math.round(5 + (qualityControlPosition.y * 95)); // 5 = best, 100 = worst
+            
+            // Update sliders
+            sliders.quality.value = jpegValue;
+            sliders.webp.value = webpValue;
+            sliders.gif.value = gifValue;
+            sliders.scale.value = scaleValue;
+            
+            // Update slider fills
+            updateSliderFill(sliders.quality);
+            updateSliderFill(sliders.webp);
+            updateSliderFill(sliders.gif);
+            updateSliderFill(sliders.scale);
+            
+            // Keep the flag false since this was a 2D -> slider update
+            slidersModifiedSince2D = false;
+        }
+
+        // Quality control 2D drag functionality
+        qualityControlPoint.addEventListener('mousedown', (e) => {
+            isQualityControlDragging = true;
+            e.preventDefault();
+        });
+
+        qualitySquare.addEventListener('mousedown', (e) => {
+            if (e.target === qualitySquare || e.target.classList.contains('quality-grid-line')) {
+                isQualityControlDragging = true;
+                const rect = qualitySquare.getBoundingClientRect();
+                const padding = 10; // Match CSS padding
+                const x = e.clientX - rect.left - padding;
+                const y = e.clientY - rect.top - padding;
+                const size = rect.width - (padding * 2);
+                
+                // Convert to normalized coordinates (0-1)
+                qualityControlPosition.x = Math.max(0, Math.min(1, x / size));
+                qualityControlPosition.y = Math.max(0, Math.min(1, 1 - (y / size))); // Invert Y
+                
+                updateQualityControlPoint();
+                updateSlidersFromControl();
+                
+                if (originalImage && !isShowingOriginal) {
+                    processImage();
+                }
+                
+                e.preventDefault();
+            }
+        });
+
+
+
+        // Crop confirm buttons
+        applyCropBtn.addEventListener('click', () => {
+            appliedCropData = { ...cropData };
+            // Hide crop UI after applying, but keep crop toggle enabled
+            cropOverlay.classList.remove('active');
+            cropConfirm.classList.remove('active');
+            cropBox.style.display = 'none';
+            clearCropOverlays();
+            processImage();
+            saveSettingsState();
+        });
+
+        cancelCropBtn.addEventListener('click', () => {
+            cropEnabled = false;
+            cropToggle.classList.remove('active');
+            disableCropping();
+            saveSettingsState();
+        });
+
+        // Handle image file
+        function handleImageFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    appliedCropData = null;
+                    isShowingOriginal = false;
+                    originalToggle.classList.remove('active');
+                    dropZone.classList.add('hidden');
+                    previewContainer.classList.add('active');
+                    infoBox.style.display = 'block';
+                    downloadBtn.disabled = false;
+                    processImage();
+                    saveInitialState();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Process original image with best settings (for preview only)
+        async function processOriginalPreview() {
+            if (!originalImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Use best quality settings
+            const scalePercent = 1; // 100% scale
+            
+            let sourceX = 0, sourceY = 0, sourceWidth = originalImage.width, sourceHeight = originalImage.height;
+            
+            // Apply crop if confirmed
+            if (appliedCropData) {
+                sourceX = appliedCropData.x;
+                sourceY = appliedCropData.y;
+                sourceWidth = appliedCropData.width;
+                sourceHeight = appliedCropData.height;
+            }
+            
+            // Set canvas size
+            canvas.width = Math.round(sourceWidth * scalePercent);
+            canvas.height = Math.round(sourceHeight * scalePercent);
+            
+            // Use high quality smoothing
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Draw original image with best settings (no effects)
+            ctx.drawImage(originalImage, 
+                sourceX, sourceY, sourceWidth, sourceHeight,
+                0, 0, canvas.width, canvas.height
+            );
+
+            // Resize to final output width of 1000px
+            const targetWidth = 1000;
+            const aspectRatio = canvas.height / canvas.width;
+            const targetHeight = Math.round(targetWidth * aspectRatio);
+            
+            const finalCanvas = document.createElement('canvas');
+            const finalCtx = finalCanvas.getContext('2d');
+            finalCanvas.width = targetWidth;
+            finalCanvas.height = targetHeight;
+            
+            finalCtx.imageSmoothingEnabled = true;
+            finalCtx.imageSmoothingQuality = 'high';
+            finalCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+
+            // Convert to JPEG with highest quality
+            finalCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                
+                // Update preview only (don't update currentBlob for download)
+                const tempImg = new Image();
+                tempImg.onload = () => {
+                    previewImage.src = url;
+                    // Don't update info box - keep showing current processed image info
+                };
+                tempImg.src = url;
+            }, 'image/jpeg', 1.0); // Highest quality
+        }
+
+        // Process image
+        async function processImage() {
+            if (!originalImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate scale
+            const scalePercent = mapScaleValue(parseInt(sliders.scale.value)) / 100;
+            
+            let sourceX = 0, sourceY = 0, sourceWidth = originalImage.width, sourceHeight = originalImage.height;
+            
+            // Apply crop if confirmed
+            if (appliedCropData) {
+                sourceX = appliedCropData.x;
+                sourceY = appliedCropData.y;
+                sourceWidth = appliedCropData.width;
+                sourceHeight = appliedCropData.height;
+            }
+            
+            // Set canvas size based on scale
+            canvas.width = Math.round(sourceWidth * scalePercent);
+            canvas.height = Math.round(sourceHeight * scalePercent);
+            
+            // Set image smoothing based on algorithm
+            if (scalingAlgorithm === 'nearest') {
+                ctx.imageSmoothingEnabled = false;
+            } else {
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+            }
+            
+            // Draw scaled image
+            ctx.drawImage(originalImage, 
+                sourceX, sourceY, sourceWidth, sourceHeight,
+                0, 0, canvas.width, canvas.height
+            );
+
+            // Apply filters
+            const saturation = sliders.saturation.value;
+            const contrast = sliders.contrast.value;
+            const brightness = sliders.brightness.value;
+            
+            ctx.filter = `saturate(${saturation}%) contrast(${contrast}%) brightness(${brightness}%)`;
+            ctx.drawImage(canvas, 0, 0);
+
+            // Apply sharpness
+            const sharpness = parseInt(sliders.sharpness.value);
+            if (sharpness > 0) {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                applySharpen(imageData, sharpness);
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            // Apply noise
+            const noiseLevel = parseInt(sliders.noise.value);
+            if (noiseLevel > 0) {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                applyNoise(imageData, noiseLevel);
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            // Apply motion blur
+            if (motionBlur.strength > 0) {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                applyMotionBlur(imageData, motionBlur);
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            // Apply GIF artifacts if needed
+            const gifQuality = mapGifValue(parseInt(sliders.gif.value));
+            if (gifQuality < 100) {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                applyGifArtifacts(imageData, gifQuality);
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            // Apply WebP artifacts if needed
+            const webpQuality = mapWebpValue(parseInt(sliders.webp.value)) / 100;
+            if (webpQuality < 1.0) {
+                // Convert to WebP first
+                const webpBlob = await new Promise(resolve => {
+                    canvas.toBlob(blob => resolve(blob), 'image/webp', webpQuality);
+                });
+                
+                // Convert back to canvas
+                const webpUrl = URL.createObjectURL(webpBlob);
+                const webpImg = new Image();
+                await new Promise(resolve => {
+                    webpImg.onload = resolve;
+                    webpImg.src = webpUrl;
+                });
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(webpImg, 0, 0);
+                URL.revokeObjectURL(webpUrl);
+            }
+
+            // Apply text layers
+            textLayers.forEach(layer => {
+                if (layer.text.trim()) {
+                    // Calculate text position and size based on canvas dimensions
+                    const textX = (layer.x / 100) * canvas.width;
+                    const textY = (layer.y / 100) * canvas.height;
+                    const fontSize = Math.max(12, (layer.fontSize / 100) * Math.min(canvas.width, canvas.height) * 0.1);
+                    
+                    // Save context state
+                    ctx.save();
+                    
+                    // Move to text position and rotate
+                    ctx.translate(textX, textY);
+                    ctx.rotate((layer.rotation * Math.PI) / 180);
+                    
+                    // Set text properties
+                    ctx.font = `${fontSize}px Arial, sans-serif`;
+                    ctx.fillStyle = layer.color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    // Draw text (at origin since we translated)
+                    ctx.fillText(layer.text, 0, 0);
+                    
+                    // Restore context state
+                    ctx.restore();
+                }
+            });
+
+            // Resize to final output width of 1000px
+            const targetWidth = 1000;
+            const aspectRatio = canvas.height / canvas.width;
+            const targetHeight = Math.round(targetWidth * aspectRatio);
+            
+            const finalCanvas = document.createElement('canvas');
+            const finalCtx = finalCanvas.getContext('2d');
+            finalCanvas.width = targetWidth;
+            finalCanvas.height = targetHeight;
+            
+            // Set image smoothing based on algorithm for final resize
+            if (scalingAlgorithm === 'nearest') {
+                finalCtx.imageSmoothingEnabled = false;
+            } else {
+                finalCtx.imageSmoothingEnabled = true;
+                finalCtx.imageSmoothingQuality = 'high';
+            }
+            
+            finalCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+
+            // Convert to JPEG with quality setting
+            const quality = mapQualityValue(parseInt(sliders.quality.value)) / 100;
+            finalCanvas.toBlob((blob) => {
+                currentBlob = blob;
+                const url = URL.createObjectURL(blob);
+                
+                // Update preview with proper scaling to fit
+                const tempImg = new Image();
+                tempImg.onload = () => {
+                    previewImage.src = url;
+                    updateInfo(finalCanvas.width, finalCanvas.height, blob.size);
+                };
+                tempImg.src = url;
+            }, 'image/jpeg', quality);
+        }
+
+        // Apply GIF-like artifacts
+        function applyGifArtifacts(imageData, quality) {
+            const data = imageData.data;
+            const colorCount = Math.floor(256 * (quality / 100));
+            const factor = 256 / colorCount;
+            
+            // Color quantization
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.floor(data[i] / factor) * factor;
+                data[i + 1] = Math.floor(data[i + 1] / factor) * factor;
+                data[i + 2] = Math.floor(data[i + 2] / factor) * factor;
+            }
+            
+            // Add dithering for low quality
+            if (quality < 50) {
+                for (let y = 0; y < imageData.height; y++) {
+                    for (let x = 0; x < imageData.width; x++) {
+                        const idx = (y * imageData.width + x) * 4;
+                        const dither = (x % 2 === y % 2) ? factor / 2 : -factor / 2;
+                        
+                        data[idx] = Math.max(0, Math.min(255, data[idx] + dither));
+                        data[idx + 1] = Math.max(0, Math.min(255, data[idx + 1] + dither));
+                        data[idx + 2] = Math.max(0, Math.min(255, data[idx + 2] + dither));
+                    }
+                }
+            }
+        }
+
+        // Update info display
+        function updateInfo(width, height, fileSize) {
+            infoResolution.textContent = `${width} × ${height}`;
+            infoFileSize.textContent = formatFileSize(fileSize);
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        // Sharpen effect
+        function applySharpen(imageData, strength) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const factor = strength / 10;
+            
+            const weights = [
+                0, -1, 0,
+                -1, 5, -1,
+                0, -1, 0
+            ];
+            
+            const side = Math.round(Math.sqrt(weights.length));
+            const halfSide = Math.floor(side / 2);
+            const output = new Uint8ClampedArray(data);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const dstOff = (y * width + x) * 4;
+                    let r = 0, g = 0, b = 0;
+                    
+                    for (let cy = 0; cy < side; cy++) {
+                        for (let cx = 0; cx < side; cx++) {
+                            const scy = y + cy - halfSide;
+                            const scx = x + cx - halfSide;
+                            
+                            if (scy >= 0 && scy < height && scx >= 0 && scx < width) {
+                                const srcOff = (scy * width + scx) * 4;
+                                const wt = weights[cy * side + cx];
+                                r += data[srcOff] * wt;
+                                g += data[srcOff + 1] * wt;
+                                b += data[srcOff + 2] * wt;
+                            }
+                        }
+                    }
+                    
+                    output[dstOff] = Math.min(255, Math.max(0, data[dstOff] + (r - data[dstOff]) * factor));
+                    output[dstOff + 1] = Math.min(255, Math.max(0, data[dstOff + 1] + (g - data[dstOff + 1]) * factor));
+                    output[dstOff + 2] = Math.min(255, Math.max(0, data[dstOff + 2] + (b - data[dstOff + 2]) * factor));
+                }
+            }
+            
+            for (let i = 0; i < data.length; i++) {
+                data[i] = output[i];
+            }
+        }
+
+        // Noise effect
+        function applyNoise(imageData, amount) {
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const noise = (Math.random() - 0.5) * amount * 2;
+                data[i] = Math.min(255, Math.max(0, data[i] + noise));
+                data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
+                data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
+            }
+        }
+
+        // Motion blur effect
+        function applyMotionBlur(imageData, blur) {
+            const data = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+            const output = new Uint8ClampedArray(data);
+            
+            // Calculate blur direction and distance
+            const blurDistance = Math.floor(blur.strength * 20); // Max 20 pixels
+            const dx = (blur.x / 100) * blurDistance;
+            const dy = (blur.y / 100) * blurDistance;
+            
+            if (blurDistance < 1) return;
+            
+            // Apply motion blur by averaging pixels along the motion vector
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    let r = 0, g = 0, b = 0, a = 0;
+                    let count = 0;
+                    
+                    // Sample pixels along the motion vector
+                    const samples = Math.max(3, Math.floor(blurDistance));
+                    for (let i = 0; i < samples; i++) {
+                        const t = i / (samples - 1) - 0.5; // -0.5 to 0.5
+                        const sampleX = Math.round(x + dx * t);
+                        const sampleY = Math.round(y + dy * t);
+                        
+                        if (sampleX >= 0 && sampleX < width && sampleY >= 0 && sampleY < height) {
+                            const sampleIdx = (sampleY * width + sampleX) * 4;
+                            r += data[sampleIdx];
+                            g += data[sampleIdx + 1];
+                            b += data[sampleIdx + 2];
+                            a += data[sampleIdx + 3];
+                            count++;
+                        }
+                    }
+                    
+                    if (count > 0) {
+                        output[idx] = Math.round(r / count);
+                        output[idx + 1] = Math.round(g / count);
+                        output[idx + 2] = Math.round(b / count);
+                        output[idx + 3] = Math.round(a / count);
+                    }
+                }
+            }
+            
+            for (let i = 0; i < data.length; i++) {
+                data[i] = output[i];
+            }
+        }
+
+        // Enable cropping
+        function enableCropping() {
+            cropOverlay.classList.add('active');
+            cropConfirm.classList.add('active');
+            cropBox.style.display = 'block';
+            
+            const imgRect = previewImage.getBoundingClientRect();
+            
+            // Initialize crop box to center
+            const boxSize = Math.min(imgRect.width * 0.8, imgRect.height * 0.8);
+            const left = (imgRect.width - boxSize) / 2;
+            const top = (imgRect.height - boxSize) / 2;
+            
+            cropBox.style.left = left + 'px';
+            cropBox.style.top = top + 'px';
+            cropBox.style.width = boxSize + 'px';
+            cropBox.style.height = boxSize + 'px';
+            
+            updateCropData();
+            updateCropOverlay();
+            setupCropHandlers();
+        }
+
+        // Disable cropping
+        function disableCropping() {
+            cropOverlay.classList.remove('active');
+            cropConfirm.classList.remove('active');
+            cropBox.style.display = 'none';
+            clearCropOverlays();
+            appliedCropData = null;
+            processImage();
+        }
+
+        // Setup crop handlers
+        function setupCropHandlers() {
+            cropBox.onmousedown = (e) => {
+                if (e.target.classList.contains('crop-handle')) {
+                    isResizing = true;
+                    resizeHandle = e.target.className.split(' ')[1];
+                } else if (e.target === cropBox) {
+                    isDragging = true;
+                }
+                dragStart.x = e.clientX;
+                dragStart.y = e.clientY;
+                e.preventDefault();
+            };
+        }
+
+        // Global mouse handlers
+        document.addEventListener('mousemove', (e) => {
+            if (isQualityControlDragging) {
+                const rect = qualitySquare.getBoundingClientRect();
+                const padding = 10; // Match CSS padding
+                const x = e.clientX - rect.left - padding;
+                const y = e.clientY - rect.top - padding;
+                const size = rect.width - (padding * 2);
+                
+                // Convert to normalized coordinates (0-1)
+                qualityControlPosition.x = Math.max(0, Math.min(1, x / size));
+                qualityControlPosition.y = Math.max(0, Math.min(1, 1 - (y / size))); // Invert Y
+                
+                updateQualityControlPoint();
+                updateSlidersFromControl();
+                
+                if (originalImage && !isShowingOriginal) {
+                    processImage();
+                }
+                
+                return;
+            }
+            
+            // Save state only when quality control drag ends
+            if (isQualityControlDragging) {
+                return;
+            }
+            
+            if (!isDragging && !isResizing && !isMotionBlurDragging) return;
+            if (isMotionBlurDragging) return; // Motion blur handled separately
+
+            const dx = e.clientX - dragStart.x;
+            const dy = e.clientY - dragStart.y;
+
+            if (isDragging) {
+                const newLeft = Math.max(0, Math.min(previewImage.offsetWidth - cropBox.offsetWidth, cropBox.offsetLeft + dx));
+                const newTop = Math.max(0, Math.min(previewImage.offsetHeight - cropBox.offsetHeight, cropBox.offsetTop + dy));
+                
+                cropBox.style.left = newLeft + 'px';
+                cropBox.style.top = newTop + 'px';
+            } else if (isResizing) {
+                handleResize(resizeHandle, dx, dy);
+            }
+
+            dragStart.x = e.clientX;
+            dragStart.y = e.clientY;
+            updateCropData();
+            updateCropOverlay();
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isQualityControlDragging) {
+                slidersModifiedSince2D = false; // Reset flag after 2D interaction
+                saveSettingsState();
+            }
+            
+            isDragging = false;
+            isResizing = false;
+            isMotionBlurDragging = false;
+            isQualityControlDragging = false;
+            resizeHandle = null;
+        });
+
+        // Handle resize
+        function handleResize(handle, dx, dy) {
+            let newLeft = cropBox.offsetLeft;
+            let newTop = cropBox.offsetTop;
+            let newWidth = cropBox.offsetWidth;
+            let newHeight = cropBox.offsetHeight;
+
+            switch(handle) {
+                case 'nw':
+                    newLeft += dx;
+                    newTop += dy;
+                    newWidth -= dx;
+                    newHeight -= dy;
+                    break;
+                case 'ne':
+                    newTop += dy;
+                    newWidth += dx;
+                    newHeight -= dy;
+                    break;
+                case 'sw':
+                    newLeft += dx;
+                    newWidth -= dx;
+                    newHeight += dy;
+                    break;
+                case 'se':
+                    newWidth += dx;
+                    newHeight += dy;
+                    break;
+            }
+
+            // Constraints
+            if (newWidth > 50 && newHeight > 50 &&
+                newLeft >= 0 && newTop >= 0 &&
+                newLeft + newWidth <= previewImage.offsetWidth &&
+                newTop + newHeight <= previewImage.offsetHeight) {
+                
+                cropBox.style.left = newLeft + 'px';
+                cropBox.style.top = newTop + 'px';
+                cropBox.style.width = newWidth + 'px';
+                cropBox.style.height = newHeight + 'px';
+            }
+        }
+
+        // Update crop data
+        function updateCropData() {
+            const scaleX = originalImage.width / previewImage.offsetWidth;
+            const scaleY = originalImage.height / previewImage.offsetHeight;
+            
+            cropData.x = Math.round(cropBox.offsetLeft * scaleX);
+            cropData.y = Math.round(cropBox.offsetTop * scaleY);
+            cropData.width = Math.round(cropBox.offsetWidth * scaleX);
+            cropData.height = Math.round(cropBox.offsetHeight * scaleY);
+        }
+
+        // Update crop overlay
+        function updateCropOverlay() {
+            const top = cropBox.offsetTop;
+            const left = cropBox.offsetLeft;
+            const right = previewImage.offsetWidth - (left + cropBox.offsetWidth);
+            const bottom = previewImage.offsetHeight - (top + cropBox.offsetHeight);
+            
+            document.getElementById('cropDarkTop').style.cssText = `top: 0; left: 0; right: 0; height: ${top}px;`;
+            document.getElementById('cropDarkLeft').style.cssText = `top: ${top}px; left: 0; width: ${left}px; height: ${cropBox.offsetHeight}px;`;
+            document.getElementById('cropDarkRight').style.cssText = `top: ${top}px; right: 0; width: ${right}px; height: ${cropBox.offsetHeight}px;`;
+            document.getElementById('cropDarkBottom').style.cssText = `bottom: 0; left: 0; right: 0; height: ${bottom}px;`;
+        }
+
+        // Clear crop overlays
+        function clearCropOverlays() {
+            document.getElementById('cropDarkTop').style.cssText = '';
+            document.getElementById('cropDarkLeft').style.cssText = '';
+            document.getElementById('cropDarkRight').style.cssText = '';
+            document.getElementById('cropDarkBottom').style.cssText = '';
+        }
+
+        // Undo/Redo system functions
+        function getCurrentSettings() {
+            return {
+                quality: sliders.quality.value,
+                webp: sliders.webp.value,
+                gif: sliders.gif.value,
+                saturation: sliders.saturation.value,
+                contrast: sliders.contrast.value,
+                brightness: sliders.brightness.value,
+                sharpness: sliders.sharpness.value,
+                noise: sliders.noise.value,
+                scale: sliders.scale.value,
+                motionBlur: { ...motionBlur },
+                cropEnabled: cropEnabled,
+                appliedCropData: appliedCropData ? { ...appliedCropData } : null,
+                qualityControl2DActive: qualityControl2DActive,
+                qualityControlPosition: { ...qualityControlPosition },
+                textLayers: JSON.parse(JSON.stringify(textLayers)),
+                nextLayerId: nextLayerId
+            };
+        }
+
+        function saveSettingsState() {
+            if (isRestoringState) return;
+            
+            const currentSettings = getCurrentSettings();
+            
+            // Remove any future states if we're not at the end
+            if (historyIndex < settingsHistory.length - 1) {
+                settingsHistory = settingsHistory.slice(0, historyIndex + 1);
+            }
+            
+            settingsHistory.push(currentSettings);
+            
+            // Keep only last 20 states
+            if (settingsHistory.length > 20) {
+                settingsHistory.shift();
+            } else {
+                historyIndex++;
+            }
+            
+            updateUndoRedoButtons();
+        }
+
+        function restoreSettings(settings) {
+            isRestoringState = true;
+            
+            sliders.quality.value = settings.quality;
+            sliders.webp.value = settings.webp;
+            sliders.gif.value = settings.gif;
+            sliders.saturation.value = settings.saturation;
+            sliders.contrast.value = settings.contrast;
+            sliders.brightness.value = settings.brightness;
+            sliders.sharpness.value = settings.sharpness;
+            sliders.noise.value = settings.noise;
+            sliders.scale.value = settings.scale;
+            
+            // Update all slider fills
+            Object.keys(sliders).forEach(key => {
+                updateSliderFill(sliders[key]);
+            });
+            
+            // Restore motion blur
+            motionBlur = { ...settings.motionBlur };
+            motionBlurPoint.style.left = `calc(50% + ${motionBlur.x}px)`;
+            motionBlurPoint.style.top = `calc(50% + ${motionBlur.y}px)`;
+            updateMotionBlurTrail();
+            
+            // Restore crop settings
+            cropEnabled = settings.cropEnabled;
+            appliedCropData = settings.appliedCropData ? { ...settings.appliedCropData } : null;
+            
+            if (cropEnabled) {
+                cropToggle.classList.add('active');
+                if (!appliedCropData) {
+                    enableCropping();
+                }
+            } else {
+                cropToggle.classList.remove('active');
+                disableCropping();
+            }
+            
+            // Restore quality control settings
+            if (settings.qualityControl2DActive !== undefined) {
+                qualityControl2DActive = settings.qualityControl2DActive;
+                if (settings.qualityControlPosition) {
+                    qualityControlPosition = { ...settings.qualityControlPosition };
+                }
+                
+                slidersModifiedSince2D = false; // Reset flag since we're restoring state
+                
+                // Update tab UI
+                if (qualityControl2DActive) {
+                    controlTab.classList.add('active');
+                    sliderTab.classList.remove('active');
+                    qualitySliders.classList.add('hidden');
+                    qualityControl2D.classList.add('active');
+                    
+                    // Use setTimeout to ensure proper rendering
+                    setTimeout(() => {
+                        updateQualityControlPoint();
+                    }, 100);
+                } else {
+                    sliderTab.classList.add('active');
+                    controlTab.classList.remove('active');
+                    qualitySliders.classList.remove('hidden');
+                    qualityControl2D.classList.remove('active');
+                }
+            }
+            
+            // Restore text layers settings
+            if (settings.textLayers) {
+                textLayers = JSON.parse(JSON.stringify(settings.textLayers));
+                nextLayerId = settings.nextLayerId || 1;
+                renderTextLayers();
+            }
+            
+            if (originalImage) {
+                processImage();
+            }
+            
+            isRestoringState = false;
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = historyIndex <= 0;
+            redoBtn.disabled = historyIndex >= settingsHistory.length - 1;
+        }
+
+        // Undo/Redo button event listeners
+        undoBtn.addEventListener('click', () => {
+            if (historyIndex > 0) {
+                historyIndex--;
+                restoreSettings(settingsHistory[historyIndex]);
+                updateUndoRedoButtons();
+            }
+        });
+
+        redoBtn.addEventListener('click', () => {
+            if (historyIndex < settingsHistory.length - 1) {
+                historyIndex++;
+                restoreSettings(settingsHistory[historyIndex]);
+                updateUndoRedoButtons();
+            }
+        });
+
+        // Reset all settings to default state
+        function resetAllSettingsToDefault() {
+            // Reset quality sliders to best quality (left side)
+            sliders.quality.value = 1;   // Best JPEG quality
+            sliders.webp.value = 1;      // Best WEBP quality
+            sliders.gif.value = 1;       // Best GIF quality
+            sliders.scale.value = 5;     // 100% scale
+            
+            // Reset adjustment sliders to neutral
+            sliders.saturation.value = 100;
+            sliders.contrast.value = 100;
+            sliders.brightness.value = 100;
+            sliders.sharpness.value = 0;
+            sliders.noise.value = 0;
+            
+            // Reset text layers
+            textLayers = [];
+            nextLayerId = 1;
+            
+            // Reset motion blur
+            motionBlur = { x: 0, y: 0, strength: 0 };
+            
+            // Reset crop settings
+            cropEnabled = false;
+            appliedCropData = null;
+            
+            // Reset quality control
+            qualityControl2DActive = false;
+            qualityControlPosition = { x: 0, y: 0 };
+            slidersModifiedSince2D = false;
+            
+            // Reset original toggle
+            isShowingOriginal = false;
+            
+            // Update all slider fills
+            Object.keys(sliders).forEach(key => {
+                updateSliderFill(sliders[key]);
+            });
+            
+            // Update UI elements
+            cropToggle.classList.remove('active');
+            renderTextLayers();
+            sliderTab.classList.add('active');
+            controlTab.classList.remove('active');
+            qualitySliders.classList.remove('hidden');
+            qualityControl2D.classList.remove('active');
+            originalToggle.classList.remove('active');
+            
+            // Reset text UI
+            textInput.value = '';
+            colorOptions.forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.color === '#ffffff') {
+                    option.classList.add('active');
+                }
+            });
+            
+            // Reset motion blur UI
+            motionBlurPoint.style.left = '50%';
+            motionBlurPoint.style.top = '50%';
+            motionBlurTrail.style.height = '0px';
+            
+            // Clear history
+            settingsHistory = [];
+            historyIndex = -1;
+            updateUndoRedoButtons();
+            
+            // Update quality control position if needed
+            if (qualityControl2DActive) {
+                setTimeout(() => {
+                    updateQualityControlPoint();
+                }, 100);
+            }
+        }
+
+        // Save initial state when image is loaded
+        function saveInitialState() {
+            settingsHistory = [];
+            historyIndex = -1;
+            saveSettingsState();
+        }
+
+        // Reset button
+        resetBtn.addEventListener('click', () => {
+            sliders.quality.value = 1;   // Maps to 100% (flipped)
+            sliders.webp.value = 1;      // Maps to 100% (flipped)
+            sliders.gif.value = 1;       // Maps to 100% (flipped)
+            sliders.saturation.value = 100;
+            sliders.contrast.value = 100;
+            sliders.brightness.value = 100;
+            sliders.sharpness.value = 0;
+            sliders.noise.value = 0;
+            sliders.scale.value = 5;  // Maps to 100% (flipped)
+            
+            // Update all slider fills
+            Object.keys(sliders).forEach(key => {
+                updateSliderFill(sliders[key]);
+            });
+            
+            // Reset motion blur
+            motionBlur = { x: 0, y: 0, strength: 0 };
+            motionBlurPoint.style.left = '50%';
+            motionBlurPoint.style.top = '50%';
+            motionBlurTrail.style.height = '0px';
+            
+            cropEnabled = false;
+            cropToggle.classList.remove('active');
+            disableCropping();
+            
+            // Reset quality control position to origin (0,0 = bottom-left = best quality)
+            qualityControlPosition.x = 0;
+            qualityControlPosition.y = 0;
+            slidersModifiedSince2D = false; // Reset flag since we're programmatically setting values
+            
+            // Reset original toggle
+            isShowingOriginal = false;
+            originalToggle.classList.remove('active');
+            
+            // Reset text layers
+            textLayers = [];
+            nextLayerId = 1;
+            
+            // Update text UI
+            renderTextLayers();
+            
+            // Update quality control position if 2D control is active
+            if (qualityControl2DActive) {
+                setTimeout(() => {
+                    updateQualityControlPoint();
+                }, 100);
+            }
+            
+            if (originalImage) {
+                processImage();
+                saveSettingsState();
+            }
+        });
+
+        // Download button
+        downloadBtn.addEventListener('click', () => {
+            if (!currentBlob) return;
+            
+            const url = URL.createObjectURL(currentBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cromched_image.jpg';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Initialize settings on page load
+        resetAllSettingsToDefault();
+    </script>
+</body>
+</html>
