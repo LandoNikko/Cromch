@@ -2,10 +2,14 @@
 
 Cromch is a local web image editor that degrades image quality. Intended to embrace "bad" aesthetics of meme images.
 
+Try it here: https://landonikko.github.io/Cromch
+
 ## Features
 
-- Provides customizable parameters for creating and fine-tuning JPG, WEBP, GIF and image scaling artifacts to input image.
-- Basic crop for getting too close to the subject
+- Add JPG, WEBP, GIF and image scaling artifacts to input image
+- Crop
+- Adjustments (Saturation, contrast, etc.)
+- Add text layers
 - Export
 
 ## Privacy & Processing
