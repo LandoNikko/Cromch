@@ -10,9 +10,9 @@
             --color-good: #4a90e2;
             --color-bad-dark: #ff7a2a;
             --color-good-dark: #3a7bd5;
-            --gradient-primary: linear-gradient(135deg, var(--color-bad), var(--color-good));
-            --gradient-primary-dark: linear-gradient(135deg, var(--color-bad-dark), var(--color-good-dark));
-            --gradient-horizontal: linear-gradient(to right, var(--color-bad), var(--color-good));
+            --gradient-primary: linear-gradient(135deg, var(--color-bad) 0%, #ff6b6b 30%, #8e44ad 70%, var(--color-good) 100%);
+            --gradient-primary-dark: linear-gradient(135deg, var(--color-bad-dark) 0%, #e74c3c 30%, #7b68ee 70%, var(--color-good-dark) 100%);
+            --gradient-horizontal: linear-gradient(to right, var(--color-bad) 0%, #ff6b6b 30%, #8e44ad 70%, var(--color-good) 100%);
         }
 
         * {
@@ -153,15 +153,32 @@
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
+            z-index: 1;
+        }
+
+        .example-button * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .example-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary-dark);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .example-button:hover::before {
+            opacity: 1;
         }
 
         .example-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
-        }
-
-        .example-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
 
         .quality-tabs {
@@ -210,11 +227,19 @@
             border: 2px solid #333;
             border-radius: 8px;
             position: relative;
-            background: linear-gradient(45deg, 
-                rgba(74, 144, 226, 0.1) 0%, 
-                rgba(255, 140, 66, 0.1) 100%);
+            background: 
+                radial-gradient(circle at 0% 100%, rgba(74, 144, 226, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 100% 0%, rgba(255, 140, 66, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 0% 0%, rgba(255, 140, 66, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255, 140, 66, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, 
+                    rgba(74, 144, 226, 0.02) 0%, 
+                    rgba(255, 255, 255, 0.01) 50%, 
+                    rgba(255, 140, 66, 0.02) 100%);
             cursor: grab;
-            overflow: hidden;
+            overflow: visible;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         .quality-square:active {
@@ -228,13 +253,16 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to right, 
-                rgba(74, 144, 226, 0.2) 0%, 
-                rgba(255, 140, 66, 0.2) 100%),
+            background: 
+                linear-gradient(to right, 
+                    rgba(74, 144, 226, 0.05) 0%, 
+                    rgba(255, 255, 255, 0.01) 50%, 
+                    rgba(255, 140, 66, 0.05) 100%),
                 linear-gradient(to bottom, 
-                rgba(255, 140, 66, 0.2) 0%, 
-                rgba(74, 144, 226, 0.2) 100%);
-            mix-blend-mode: multiply;
+                    rgba(255, 140, 66, 0.05) 0%, 
+                    rgba(255, 255, 255, 0.01) 50%, 
+                    rgba(74, 144, 226, 0.05) 100%);
+            mix-blend-mode: overlay;
         }
 
         .quality-corner-label {
@@ -248,26 +276,26 @@
         }
 
         .quality-corner-label.top-left {
-            top: 8px;
-            left: 8px;
+            top: 18px;
+            left: 18px;
             color: var(--color-bad);
         }
 
         .quality-corner-label.top-right {
-            top: 8px;
-            right: 8px;
+            top: 18px;
+            right: 18px;
             color: var(--color-bad);
         }
 
         .quality-corner-label.bottom-left {
-            bottom: 8px;
-            left: 8px;
+            bottom: 18px;
+            left: 18px;
             color: var(--color-good);
         }
 
         .quality-corner-label.bottom-right {
-            bottom: 8px;
-            right: 8px;
+            bottom: 18px;
+            right: 18px;
             color: var(--color-bad);
         }
 
@@ -296,7 +324,7 @@
 
         .quality-grid {
             position: absolute;
-            inset: 0;
+            inset: 10px;
             opacity: 0.1;
             pointer-events: none;
         }
@@ -557,6 +585,8 @@
             --fill-percent: 100%;
             background: linear-gradient(to right, 
                 var(--color-bad) 0%, 
+                #ff6b6b calc(var(--fill-percent) * 0.3), 
+                #8e44ad calc(var(--fill-percent) * 0.7), 
                 var(--color-good) var(--fill-percent), 
                 #2a2a2a var(--fill-percent), 
                 #2a2a2a 100%);
@@ -1022,6 +1052,7 @@
                 </div>
                 
                 <div class="control-section">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #d0d0d0;">Quality Settings</h3>
                     <div class="quality-tabs">
                         <button class="quality-tab active" id="sliderTab">Sliders</button>
                         <button class="quality-tab" id="controlTab">2D Control</button>
@@ -1083,18 +1114,18 @@
                                 <div class="quality-grid-line horizontal" style="top: 50%"></div>
                                 <div class="quality-grid-line horizontal" style="top: 75%"></div>
                             </div>
-                            <div class="quality-corner-label top-left">Worst</div>
-                            <div class="quality-corner-label top-right">Worst</div>
+                            <div class="quality-corner-label top-left">Awful</div>
+                            <div class="quality-corner-label top-right">Why?</div>
                             <div class="quality-corner-label bottom-left">Best</div>
                             <div class="quality-corner-label bottom-right">Bad</div>
                             <div class="quality-control-point" id="qualityControlPoint"></div>
                         </div>
                         <div style="margin-top: 12px; font-size: 0.8rem; color: #666; text-align: center;">
                             <div style="margin-bottom: 4px;">
-                                <strong>X-axis:</strong> JPEG Quality • WEBP Artifacts
+                                <strong>X-axis:</strong> JPEG Quality • GIF Artifacts
                             </div>
                             <div>
-                                <strong>Y-axis:</strong> GIF Artifacts • Image Scale
+                                <strong>Y-axis:</strong> WEBP Artifacts • Image Scale
                             </div>
                         </div>
                     </div>
@@ -1110,6 +1141,7 @@
                         </div>
                     </div>
                     <div class="collapsible-content" id="styleContent">
+                        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #d0d0d0;">Adjustment Settings</h3>
                         <div class="control-group">
                             <div class="control-header">
                                 <label class="control-label">Saturation</label>
@@ -1194,7 +1226,10 @@
                     <span class="info-label">File Size</span>
                     <span class="info-value" id="infoFileSize">-</span>
                 </div>
-
+                <div class="info-row" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid #333;">
+                    <span class="info-label">Show Original</span>
+                    <div class="toggle" id="originalToggle" style="width: 36px; height: 20px;"></div>
+                </div>
             </div>
             
             <div class="action-buttons">
@@ -1223,6 +1258,8 @@
         let qualityControl2DActive = false;
         let qualityControlPosition = { x: 0, y: 0 }; // 0,0 = bottom-left (best quality)
         let isQualityControlDragging = false;
+        let slidersModifiedSince2D = false; // Track if sliders changed since last 2D interaction
+        let isShowingOriginal = false; // Track if showing original image preview
 
         // Undo/Redo system
         let settingsHistory = [];
@@ -1269,6 +1306,7 @@
         // Info elements
         const infoResolution = document.getElementById('infoResolution');
         const infoFileSize = document.getElementById('infoFileSize');
+        const originalToggle = document.getElementById('originalToggle');
 
         // Sliders
         const sliders = {
@@ -1295,6 +1333,20 @@
         // Logo click to refresh page
         logoTitle.addEventListener('click', () => {
             window.location.reload();
+        });
+
+        // Original image toggle
+        originalToggle.addEventListener('click', () => {
+            isShowingOriginal = !isShowingOriginal;
+            originalToggle.classList.toggle('active');
+            
+            if (originalImage) {
+                if (isShowingOriginal) {
+                    processOriginalPreview();
+                } else {
+                    processImage();
+                }
+            }
         });
 
         // Example image button
@@ -1347,13 +1399,20 @@
             // Update display and process image while dragging
             sliders[key].addEventListener('input', (e) => {
                 updateSliderFill(e.target);
-                if (originalImage) {
+                if (originalImage && !isShowingOriginal) {
                     processImage();
                 }
+                
+                // No real-time 2D update - only update when switching to 2D view
             });
             
             // Save state only when user releases the slider
             sliders[key].addEventListener('change', (e) => {
+                // Mark that sliders have been modified since last 2D interaction
+                if (['quality', 'webp', 'gif', 'scale'].includes(key)) {
+                    slidersModifiedSince2D = true;
+                }
+                
                 if (originalImage) {
                     saveSettingsState();
                 }
@@ -1437,7 +1496,7 @@
                 motionBlurPoint.style.top = `calc(50% + ${motionBlur.y}px)`;
                 updateMotionBlurTrail();
                 
-                if (originalImage) processImage();
+                if (originalImage && !isShowingOriginal) processImage();
                 if (originalImage) saveSettingsState();
                 e.preventDefault();
             }
@@ -1464,7 +1523,7 @@
                 motionBlurPoint.style.top = `calc(50% + ${motionBlur.y}px)`;
                 updateMotionBlurTrail();
                 
-                if (originalImage) processImage();
+                if (originalImage && !isShowingOriginal) processImage();
                 if (originalImage) saveSettingsState();
             }
         });
@@ -1503,48 +1562,68 @@
             qualitySliders.classList.add('hidden');
             qualityControl2D.classList.add('active');
             
-            // Initialize control point position based on current slider values
-            updateControlPointFromSliders();
+            // Only update control point position from sliders if they've been modified
+            if (slidersModifiedSince2D) {
+                setTimeout(() => {
+                    updateControlPointFromSliders();
+                    slidersModifiedSince2D = false; // Reset flag after updating
+                }, 100);
+            } else {
+                // Just update the visual position without recalculating
+                setTimeout(() => {
+                    updateQualityControlPoint();
+                }, 100);
+            }
         });
 
         // Initialize quality control point position
         function updateControlPointFromSliders() {
             // Map slider values to 2D position
-            // X-axis: average of JPEG quality (inverted) and WEBP artifacts (inverted)
+            // X-axis: average of JPEG quality (inverted) and GIF artifacts (inverted)
             const jpegNormalized = 1 - (mapQualityValue(sliders.quality.value) / 100);
-            const webpNormalized = 1 - (mapWebpValue(sliders.webp.value) / 100);
-            
-            // Y-axis: average of GIF artifacts (inverted) and Image scale (inverted)
             const gifNormalized = 1 - (mapGifValue(sliders.gif.value) / 100);
+            
+            // Y-axis: average of WEBP artifacts (inverted) and Image scale (inverted)
+            const webpNormalized = 1 - (mapWebpValue(sliders.webp.value) / 100);
             const scaleNormalized = 1 - (parseInt(sliders.scale.value) / 100);
             
-            qualityControlPosition.x = (jpegNormalized + webpNormalized) / 2;
-            qualityControlPosition.y = (gifNormalized + scaleNormalized) / 2;
+            qualityControlPosition.x = (jpegNormalized + gifNormalized) / 2;
+            qualityControlPosition.y = (webpNormalized + scaleNormalized) / 2;
             
             updateQualityControlPoint();
         }
 
         function updateQualityControlPoint() {
             const rect = qualitySquare.getBoundingClientRect();
-            const size = rect.width;
+            const padding = 10; // Match CSS padding
+            const size = rect.width - (padding * 2);
             
-            // Convert position (0-1) to pixel coordinates
+            // Ensure the element has proper dimensions
+            if (rect.width <= 0 || rect.height <= 0) {
+                return;
+            }
+            
+            // Convert position (0-1) to pixel coordinates within the padded area
             // Note: y is inverted because 0,0 should be bottom-left
-            const x = qualityControlPosition.x * size;
-            const y = (1 - qualityControlPosition.y) * size;
+            const x = padding + (qualityControlPosition.x * size);
+            const y = padding + ((1 - qualityControlPosition.y) * size);
             
             qualityControlPoint.style.left = x + 'px';
             qualityControlPoint.style.top = y + 'px';
         }
 
         function updateSlidersFromControl() {
-            // Map 2D position back to slider values
-            // X-axis affects JPEG quality and WEBP artifacts
-            const jpegValue = Math.round(20 - (qualityControlPosition.x * 19)); // 20 = best, 1 = worst
-            const webpValue = Math.round(10 - (qualityControlPosition.x * 9)); // 10 = best, 1 = worst
+            // Temporarily prevent slider change events from setting the modified flag
+            const originalFlag = slidersModifiedSince2D;
+            slidersModifiedSince2D = false;
             
-            // Y-axis affects GIF artifacts and Image scale
-            const gifValue = Math.round(20 - (qualityControlPosition.y * 19)); // 20 = best, 1 = worst
+            // Map 2D position back to slider values
+            // X-axis affects JPEG quality and GIF artifacts
+            const jpegValue = Math.round(20 - (qualityControlPosition.x * 19)); // 20 = best, 1 = worst
+            const gifValue = Math.round(20 - (qualityControlPosition.x * 19)); // 20 = best, 1 = worst
+            
+            // Y-axis affects WEBP artifacts and Image scale
+            const webpValue = Math.round(10 - (qualityControlPosition.y * 9)); // 10 = best, 1 = worst
             const scaleValue = Math.round(100 - (qualityControlPosition.y * 95)); // 100 = best, 5 = worst
             
             // Update sliders
@@ -1558,6 +1637,9 @@
             updateSliderFill(sliders.webp);
             updateSliderFill(sliders.gif);
             updateSliderFill(sliders.scale);
+            
+            // Keep the flag false since this was a 2D -> slider update
+            slidersModifiedSince2D = false;
         }
 
         // Quality control 2D drag functionality
@@ -1570,17 +1652,19 @@
             if (e.target === qualitySquare || e.target.classList.contains('quality-grid-line')) {
                 isQualityControlDragging = true;
                 const rect = qualitySquare.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const padding = 10; // Match CSS padding
+                const x = e.clientX - rect.left - padding;
+                const y = e.clientY - rect.top - padding;
+                const size = rect.width - (padding * 2);
                 
                 // Convert to normalized coordinates (0-1)
-                qualityControlPosition.x = Math.max(0, Math.min(1, x / rect.width));
-                qualityControlPosition.y = Math.max(0, Math.min(1, 1 - (y / rect.height))); // Invert Y
+                qualityControlPosition.x = Math.max(0, Math.min(1, x / size));
+                qualityControlPosition.y = Math.max(0, Math.min(1, 1 - (y / size))); // Invert Y
                 
                 updateQualityControlPoint();
                 updateSlidersFromControl();
                 
-                if (originalImage) {
+                if (originalImage && !isShowingOriginal) {
                     processImage();
                 }
                 
@@ -1588,48 +1672,7 @@
             }
         });
 
-        // Update mouse move handler to include quality control
-        document.addEventListener('mousemove', (e) => {
-            if (isQualityControlDragging) {
-                const rect = qualitySquare.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                // Convert to normalized coordinates (0-1)
-                qualityControlPosition.x = Math.max(0, Math.min(1, x / rect.width));
-                qualityControlPosition.y = Math.max(0, Math.min(1, 1 - (y / rect.height))); // Invert Y
-                
-                updateQualityControlPoint();
-                updateSlidersFromControl();
-                
-                if (originalImage) {
-                    processImage();
-                }
-                
-                return;
-            }
-            
-            if (!isDragging && !isResizing && !isMotionBlurDragging) return;
-            if (isMotionBlurDragging) return; // Motion blur handled separately
 
-            const dx = e.clientX - dragStart.x;
-            const dy = e.clientY - dragStart.y;
-
-            if (isDragging) {
-                const newLeft = Math.max(0, Math.min(previewImage.offsetWidth - cropBox.offsetWidth, cropBox.offsetLeft + dx));
-                const newTop = Math.max(0, Math.min(previewImage.offsetHeight - cropBox.offsetHeight, cropBox.offsetTop + dy));
-                
-                cropBox.style.left = newLeft + 'px';
-                cropBox.style.top = newTop + 'px';
-            } else if (isResizing) {
-                handleResize(resizeHandle, dx, dy);
-            }
-
-            dragStart.x = e.clientX;
-            dragStart.y = e.clientY;
-            updateCropData();
-            updateCropOverlay();
-        });
 
         // Crop confirm buttons
         applyCropBtn.addEventListener('click', () => {
@@ -1658,6 +1701,8 @@
                 img.onload = () => {
                     originalImage = img;
                     appliedCropData = null;
+                    isShowingOriginal = false;
+                    originalToggle.classList.remove('active');
                     dropZone.classList.add('hidden');
                     previewContainer.classList.add('active');
                     infoBox.style.display = 'block';
@@ -1668,6 +1713,68 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        }
+
+        // Process original image with best settings (for preview only)
+        async function processOriginalPreview() {
+            if (!originalImage) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Use best quality settings
+            const scalePercent = 1; // 100% scale
+            
+            let sourceX = 0, sourceY = 0, sourceWidth = originalImage.width, sourceHeight = originalImage.height;
+            
+            // Apply crop if confirmed
+            if (appliedCropData) {
+                sourceX = appliedCropData.x;
+                sourceY = appliedCropData.y;
+                sourceWidth = appliedCropData.width;
+                sourceHeight = appliedCropData.height;
+            }
+            
+            // Set canvas size
+            canvas.width = Math.round(sourceWidth * scalePercent);
+            canvas.height = Math.round(sourceHeight * scalePercent);
+            
+            // Use high quality smoothing
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Draw original image with best settings (no effects)
+            ctx.drawImage(originalImage, 
+                sourceX, sourceY, sourceWidth, sourceHeight,
+                0, 0, canvas.width, canvas.height
+            );
+
+            // Resize to final output width of 1000px
+            const targetWidth = 1000;
+            const aspectRatio = canvas.height / canvas.width;
+            const targetHeight = Math.round(targetWidth * aspectRatio);
+            
+            const finalCanvas = document.createElement('canvas');
+            const finalCtx = finalCanvas.getContext('2d');
+            finalCanvas.width = targetWidth;
+            finalCanvas.height = targetHeight;
+            
+            finalCtx.imageSmoothingEnabled = true;
+            finalCtx.imageSmoothingQuality = 'high';
+            finalCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+
+            // Convert to JPEG with highest quality
+            finalCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                
+                // Update preview only (don't update currentBlob for download)
+                const tempImg = new Image();
+                tempImg.onload = () => {
+                    previewImage.src = url;
+                    // Don't update info box - keep showing current processed image info
+                };
+                tempImg.src = url;
+            }, 'image/jpeg', 1.0); // Highest quality
         }
 
         // Process image
@@ -2006,6 +2113,32 @@
 
         // Global mouse handlers
         document.addEventListener('mousemove', (e) => {
+            if (isQualityControlDragging) {
+                const rect = qualitySquare.getBoundingClientRect();
+                const padding = 10; // Match CSS padding
+                const x = e.clientX - rect.left - padding;
+                const y = e.clientY - rect.top - padding;
+                const size = rect.width - (padding * 2);
+                
+                // Convert to normalized coordinates (0-1)
+                qualityControlPosition.x = Math.max(0, Math.min(1, x / size));
+                qualityControlPosition.y = Math.max(0, Math.min(1, 1 - (y / size))); // Invert Y
+                
+                updateQualityControlPoint();
+                updateSlidersFromControl();
+                
+                if (originalImage && !isShowingOriginal) {
+                    processImage();
+                }
+                
+                return;
+            }
+            
+            // Save state only when quality control drag ends
+            if (isQualityControlDragging) {
+                return;
+            }
+            
             if (!isDragging && !isResizing && !isMotionBlurDragging) return;
             if (isMotionBlurDragging) return; // Motion blur handled separately
 
@@ -2029,6 +2162,11 @@
         });
 
         document.addEventListener('mouseup', () => {
+            if (isQualityControlDragging) {
+                slidersModifiedSince2D = false; // Reset flag after 2D interaction
+                saveSettingsState();
+            }
+            
             isDragging = false;
             isResizing = false;
             isMotionBlurDragging = false;
@@ -2125,7 +2263,9 @@
                 scale: sliders.scale.value,
                 motionBlur: { ...motionBlur },
                 cropEnabled: cropEnabled,
-                appliedCropData: appliedCropData ? { ...appliedCropData } : null
+                appliedCropData: appliedCropData ? { ...appliedCropData } : null,
+                qualityControl2DActive: qualityControl2DActive,
+                qualityControlPosition: { ...qualityControlPosition }
             };
         }
 
@@ -2187,6 +2327,34 @@
             } else {
                 cropToggle.classList.remove('active');
                 disableCropping();
+            }
+            
+            // Restore quality control settings
+            if (settings.qualityControl2DActive !== undefined) {
+                qualityControl2DActive = settings.qualityControl2DActive;
+                if (settings.qualityControlPosition) {
+                    qualityControlPosition = { ...settings.qualityControlPosition };
+                }
+                
+                slidersModifiedSince2D = false; // Reset flag since we're restoring state
+                
+                // Update tab UI
+                if (qualityControl2DActive) {
+                    controlTab.classList.add('active');
+                    sliderTab.classList.remove('active');
+                    qualitySliders.classList.add('hidden');
+                    qualityControl2D.classList.add('active');
+                    
+                    // Use setTimeout to ensure proper rendering
+                    setTimeout(() => {
+                        updateQualityControlPoint();
+                    }, 100);
+                } else {
+                    sliderTab.classList.add('active');
+                    controlTab.classList.remove('active');
+                    qualitySliders.classList.remove('hidden');
+                    qualityControl2D.classList.remove('active');
+                }
             }
             
             if (originalImage) {
@@ -2252,8 +2420,25 @@
             cropToggle.classList.remove('active');
             disableCropping();
             
+            // Reset quality control position to origin (0,0 = bottom-left = best quality)
+            qualityControlPosition.x = 0;
+            qualityControlPosition.y = 0;
+            slidersModifiedSince2D = false; // Reset flag since we're programmatically setting values
+            
+            // Reset original toggle
+            isShowingOriginal = false;
+            originalToggle.classList.remove('active');
+            
+            // Update quality control position if 2D control is active
+            if (qualityControl2DActive) {
+                setTimeout(() => {
+                    updateQualityControlPoint();
+                }, 100);
+            }
+            
             if (originalImage) {
                 processImage();
+                saveSettingsState();
             }
         });
 
