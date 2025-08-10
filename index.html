@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cromch</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Rubik+Bubbles&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Sniglet&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-bad: #ff8c42;
-            --color-good: #4a90e2;
-            --color-bad-dark: #ff7a2a;
-            --color-good-dark: #3a7bd5;
-            --gradient-primary: linear-gradient(135deg, var(--color-good) 0%, #4a90e2 30%, #8e44ad 70%, var(--color-bad) 100%);
-            --gradient-primary-dark: linear-gradient(135deg, var(--color-good-dark) 0%, #3a7bd5 30%, #7b68ee 70%, var(--color-bad-dark) 100%);
-            --gradient-horizontal: linear-gradient(to right, var(--color-good) 0%, #4a90e2 30%, #8e44ad 70%, var(--color-bad) 100%);
+            --bg-primary: #009b52;
+            --bg-secondary: #5ec280;
+            --white-primary: #ffffff;
+            --black-primary: #0f0f0f;
+            --hover-primary: #ffb95f;
+            --shadow-primary: rgba(0, 0, 0, 0.2);
+            --accent-primary: #2563eb;
+            --color-danger: #ef4444;
+            --color-success: #84cc16;
         }
 
         * {
@@ -22,10 +27,16 @@
             box-sizing: border-box;
         }
 
+        h2, h3 {
+            font-family: 'Sniglet';
+            font-size: 1.1rem;
+            cursor: default;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f0f0f;
-            color: #fff;
+            font-family: 'Space Grotesk', "Segoe UI", system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--black-primary);
             height: 100vh;
             overflow: hidden;
         }
@@ -39,67 +50,38 @@
         .main-area {
             display: flex;
             flex-direction: column;
-            background: #111;
+            background: var(--bg-primary);
+            color: var(--color-on-background);
             overflow: hidden;
         }
 
         .header {
-            background: #1a1a1a;
+            background: transparent;
             padding: 16px 24px;
-            border-bottom: 1px solid #282828;
+            border-bottom: 2px solid var(--black-primary);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .header h1 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #f0f0f0;
+            font-family: 'Rubik Bubbles';
+            font-size: 2rem;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.2s ease-out;
             position: relative;
             overflow: hidden;
         }
 
-        .header h1:hover {
-            transform: scale(1.05);
-            color: #fff;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.4));
-        }
-
-        .header h1::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s;
-        }
-
-        .header h1:hover::before {
-            left: 100%;
-        }
-
-        .header h1::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--gradient-primary);
-            border-radius: 1px;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            transform: translateX(-50%);
-        }
-
-        .header h1:hover::after {
-            width: 100%;
-            box-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
+        .header h1:hover { 
+            color: var(--hover-primary); 
+            scale: 1.02;
         }
 
         .image-area {
@@ -109,43 +91,38 @@
             justify-content: center;
             position: relative;
             padding: 20px;
-            background: #0a0a0a;
+            background: var(--bg-secondary);
         }
 
         .drop-zone {
             position: absolute;
-            inset: 20px;
-            border: 2px dashed #333;
-            border-radius: 12px;
+            padding: 5rem;
+            border: 2px dashed var(--black-primary);
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.02);
-            transition: all 0.3s;
+            background: var(--white-primary);
             cursor: pointer;
+            box-shadow: 6px 6px 0 var(--shadow-primary);
+            color: var(--black-primary);
         }
 
-        .drop-zone:hover {
-            border-color: #555;
-            background: rgba(255, 255, 255, 0.04);
-        }
+        .drop-zone:hover { background: #fffdfa; }
 
         .drop-zone.active {
             border-color: #ff6b6b;
             background: rgba(255, 107, 107, 0.05);
         }
 
-        .drop-zone.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        .drop-zone.hidden { opacity: 0; pointer-events: none; }
 
         .main-button {
             margin-top: 20px;
             padding: 12px 24px;
             background: #111;
-            color: #fff;
+            color: var(--white-primary);
             border: none;
             border-radius: 8px;
             font-size: 0.9rem;
@@ -180,36 +157,35 @@
             opacity: 0;
         }
 
-        .main-button:hover {
-            transform: translateY(-1px);
-        }
-
         .quality-tabs {
             display: flex;
-            margin: 16px 0 16px 0;
-            border-bottom: 1px solid #333;
         }
 
         .quality-tab {
-            flex: 1;
-            padding: 10px 16px;
             background: transparent;
-            border: none;
             color: #888;
-            cursor: pointer;
+            border: 1px solid #333;
+            padding: 6px 16px;
             font-size: 0.85rem;
-            font-weight: 500;
+            cursor: pointer;
             transition: all 0.3s;
-            border-bottom: 2px solid transparent;
+            margin: 0;
+            box-shadow: 3px 4px 0 var(--shadow-primary);
+            z-index: 1;
+        }
+
+        .quality-tab:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+
+        .quality-tab:last-child {
+            border-radius: 0 4px 4px 0;
         }
 
         .quality-tab.active {
-            color: #fff;
-            border-bottom-color: var(--color-good);
-        }
-
-        .quality-tab:hover:not(.active) {
-            color: #ccc;
+            background: var(--hover-primary);
+            box-shadow: 2px 2px 0 var(--shadow-primary);
+            transform: translateY(2px);
         }
 
         .quality-control-2d {
@@ -249,25 +225,6 @@
             cursor: grabbing;
         }
 
-        .quality-square::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                linear-gradient(to right, 
-                    rgba(74, 144, 226, 0.05) 0%, 
-                    rgba(255, 255, 255, 0.01) 50%, 
-                    rgba(255, 140, 66, 0.05) 100%),
-                linear-gradient(to bottom, 
-                    rgba(255, 140, 66, 0.05) 0%, 
-                    rgba(255, 255, 255, 0.01) 50%, 
-                    rgba(74, 144, 226, 0.05) 100%);
-            mix-blend-mode: overlay;
-        }
-
         .quality-corner-label {
             position: absolute;
             font-size: 0.7rem;
@@ -281,25 +238,25 @@
         .quality-corner-label.top-left {
             top: 18px;
             left: 18px;
-            color: var(--color-bad);
+            color: var(--black-primary);
         }
 
         .quality-corner-label.top-right {
             top: 18px;
             right: 18px;
-            color: var(--color-bad);
+            color: var(--black-primary);
         }
 
         .quality-corner-label.bottom-left {
             bottom: 18px;
             left: 18px;
-            color: var(--color-good);
+            color: var(--black-primary);
         }
 
         .quality-corner-label.bottom-right {
             bottom: 18px;
             right: 18px;
-            color: var(--color-bad);
+            color: var(--black-primary);
         }
 
         .quality-control-point {
@@ -307,7 +264,7 @@
             width: 16px;
             height: 16px;
             background: var(--gradient-primary);
-            border: 3px solid #fff;
+            border: 3px solid var(--white-primary);
             border-radius: 50%;
             cursor: grab;
             z-index: 4;
@@ -316,13 +273,54 @@
             transform: translate(-50%, -50%);
         }
 
-        .quality-control-point:hover {
-            transform: translate(-50%, -50%) scale(1.1);
+        .quality-control-point:active { cursor: grabbing; }
+
+        .quality-info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--black-primary);
+            color: var(--white-primary);
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+            position: relative;
         }
 
-        .quality-control-point:active {
-            cursor: grabbing;
-            transform: translate(-50%, -50%) scale(0.9);
+        .quality-info-tooltip {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--black-primary);
+            color: var(--white-primary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .quality-info-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: var(--black-primary);
+        }
+
+        .quality-info-icon:hover .quality-info-tooltip {
+            opacity: 1;
+            visibility: visible;
         }
 
         .quality-grid {
@@ -334,7 +332,7 @@
 
         .quality-grid-line {
             position: absolute;
-            background: #fff;
+            background: var(--white-primary);
         }
 
         .quality-grid-line.vertical {
@@ -366,10 +364,10 @@
         }
 
         .drop-icon {
-            width: 48px;
-            height: 48px;
+            width: 60px;
+            height: 60px;
             margin-bottom: 16px;
-            opacity: 0.5;
+            color: var(--black-primary);
         }
 
         .preview-container {
@@ -422,7 +420,7 @@
             width: 10px;
             height: 10px;
             background: #ff6b6b;
-            border: 2px solid #fff;
+            border: 2px solid var(--white-primary);
             border-radius: 2px;
         }
 
@@ -457,7 +455,7 @@
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 23px;
             border-bottom: 1px solid #282828;
             position: relative;
         }
@@ -506,8 +504,9 @@
         }
 
         .button-small:hover:not(:disabled) {
-            background: #333;
-            color: #fff;
+            background: var(--hover-primary);
+            color: var(--black-primary);
+            border-color: var(--black-primary);
         }
 
         .button-small:disabled {
@@ -521,7 +520,7 @@
 
         .button-small#resetBtn:hover:not(:disabled) {
             background: #8b2635;
-            color: #fff;
+            color: var(--white-primary);
         }
 
         .controls {
@@ -530,7 +529,7 @@
         }
 
         .control-section {
-            margin: 15px 0 15px 0;
+            margin-top: 15px;
             border-bottom: 1px solid #282828;
         }
 
@@ -584,6 +583,7 @@
             border-radius: 3px;
             outline: none;
             -webkit-appearance: none;
+            appearance: none;
             --fill-percent: 100%;
             background: linear-gradient(to right, 
                 var(--color-good) 0%, 
@@ -600,7 +600,7 @@
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: #fff;
+            background: var(--white-primary);
             border: 2px solid #333;
             cursor: pointer;
             transition: transform 0.2s;
@@ -615,7 +615,7 @@
             width: 18px;
             height: 18px;
             border-radius: 50%;
-            background: #fff;
+            background: var(--white-primary);
             border: 2px solid #333;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -651,7 +651,7 @@
             left: 3px;
             width: 18px;
             height: 18px;
-            background: #fff;
+            background: var(--white-primary);
             border-radius: 50%;
             transition: transform 0.3s;
         }
@@ -685,7 +685,7 @@
         .radio-option.active {
             background: #ff6b6b;
             border-color: #ff6b6b;
-            color: #fff;
+            color: var(--white-primary);
         }
 
         .collapsible {
@@ -770,12 +770,12 @@
             font-size: 1.1rem;
         }
 
-        .preset-button.randomizer {
+        .button-small.randomizer {
             position: relative;
             overflow: hidden;
         }
 
-        .preset-button.randomizer i:last-child {
+        .button-small.randomizer i:last-child {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -784,15 +784,15 @@
             transition: opacity 0.2s;
         }
 
-        .preset-button.randomizer:hover i:first-child {
+        .button-small.randomizer:hover i:first-child {
             opacity: 0;
         }
 
-        .preset-button.randomizer:hover i:last-child {
+        .button-small.randomizer:hover i:last-child {
             opacity: 1;
         }
 
-        .preset-button.randomizer.rolling i:last-child {
+        .button-small.randomizer.rolling i:last-child {
             animation: rollDice 0.2s ease-out;
         }
 
@@ -912,7 +912,7 @@
             left: 50%;
             width: 6px;
             height: 6px;
-            background: #666;
+            background: var(--shadow-primary);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             z-index: 3;
@@ -1004,44 +1004,23 @@
         }
 
         .button.primary {
-            background: #111;
-            color: #fff;
-            border: none;
+            background: var(--accent-primary);
+            color: var(--white-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 10px;
             position: relative;
             overflow: hidden;
             z-index: 1;
         }
 
-        .button.primary::before {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            border-radius: 8px;
-            background: var(--gradient-primary);
-            z-index: -1;
-        }
+        .button.primary::before { content: none; }
+        .button.primary::after { content: none; }
 
-        .button.primary::after {
-            content: '';
-            position: absolute;
-            inset: 1px;
-            border-radius: 7px;
-            background: #111;
-            z-index: -1;
-            transition: opacity 0.3s;
-        }
-
-        .button.primary:hover::after {
-            opacity: 0;
-        }
-
-        .button.primary:hover {
-            transform: translateY(-1px);
-        }
+.button.primary:hover { box-shadow: 6px 6px 0 var(--shadow-primary); }
 
         .button.secondary {
             background: #2a2a2a;
-            color: #fff;
+            color: var(--white-primary);
             border: 1px solid #333;
         }
 
@@ -1079,66 +1058,302 @@
                 height: 100vh;
             }
 
-            .main-area {
-                min-height: 0; /* Allow flex child to shrink */
-                display: flex;
-                flex-direction: column;
-            }
+            .main-area { min-height: 0; display: flex; flex-direction: column; }
 
-            .image-area {
-                flex: 1;
-                min-height: 0; /* Allow flex child to shrink */
-                padding: 10px;
-            }
+            .image-area { flex: 1; min-height: 0; padding: 10px; }
 
-            .preview-container {
-                max-width: 100%;
-                max-height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+            .preview-container { max-width: 100%; max-height: 100%; display: flex; align-items: center; justify-content: center; }
 
-            .preview-image {
-                max-width: 100%;
-                max-height: 100%;
-                width: auto;
-                height: auto;
-                object-fit: contain;
-            }
+            .preview-image { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
 
-            .drop-zone {
-                inset: 10px;
-            }
+            .sidebar { border-left: none; border-top: 1px solid #282828; max-height: 50vh; min-height: 200px; }
 
-            .sidebar {
-                border-left: none;
-                border-top: 1px solid #282828;
-                max-height: 50vh;
-                min-height: 200px;
-            }
+            .header { padding: 12px 16px; }
 
-            .header {
-                padding: 12px 16px;
-            }
+            .sidebar-header { padding: 16px; }
 
-            .header h1 {
-                font-size: 1.2rem;
-            }
+            .controls { padding: 16px; }
 
-            .sidebar-header {
-                padding: 16px;
-            }
-
-            .controls {
-                padding: 16px;
-            }
-
-            .motion-blur-control {
-                max-width: 200px;
-                margin: 8px auto;
-            }
+            .motion-blur-control { max-width: 200px; margin: 8px auto; }
         }
+
+        body {
+            background-image: radial-gradient(rgba(15,15,15,0.06) 1px, transparent 1px);
+            background-size: 18px 18px;
+        }
+
+        .app-container { background: var(--bg-primary); }
+
+        .main-area { background: var(--bg-primary); color: var(--white-primary); }
+
+        .header {
+            background: transparent;
+            border-bottom: 2px solid var(--black-primary);
+        }
+
+        .header h1 {
+            color: var(--white-primary);
+            text-shadow: none;
+        }
+
+        .header h1::before,
+        .header h1::after { display: none; }
+
+        .image-area { background: var(--bg-secondary); }
+
+        .drop-zone:hover { scale: 1.01; }
+
+        .main-button,
+        .button,
+        .button-small,
+        .preset-button {
+            background: var(--white-primary);
+            color: var(--black-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 10px;
+            box-shadow: 4px 4px 0 var(--shadow-primary);
+        }
+
+        .main-button::before,
+        .main-button::after,
+        .button.primary::before,
+        .button.primary::after { content: none; }
+
+        .main-button:hover,
+        .button:hover,
+        .button-small:hover,
+        .preset-button:hover {
+            background: var(--hover-primary);
+        }
+
+        .button.primary { background: var(--accent-primary); color: var(--white-primary); }
+        .button.secondary { background: var(--white-primary); color: var(--black-primary); }
+
+        .sidebar {
+            background: var(--bg-primary);
+            border-left: 2px solid var(--black-primary);
+            color: var(--white-primary);
+        }
+
+        .sidebar-header,
+        .button-section { border-bottom: 2px solid var(--black-primary); }
+
+        .controls { background: transparent; }
+
+        .control-section { border-bottom: 2px solid var(--black-primary); }
+        .control-section:last-child { border-bottom: 2px solid var(--black-primary); }
+
+        .text-layer,
+        .info-box {
+            background: var(--white-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 10px;
+            box-shadow: 4px 4px 0 var(--shadow-primary);
+            color: var(--black-primary);
+        }
+
+        .collapsible-header {
+            background: var(--white-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 10px;
+            color: var(--black-primary);
+        }
+
+        .collapsible-header:hover { background: #f5f5f5; }
+
+        .quality-tab {
+            background: var(--white-primary);
+            color: var(--black-primary);
+            border: 2px solid var(--black-primary);
+        }
+
+        .quality-tab:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .quality-tab:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .quality-tab:not(:first-child) {
+            border-left: none;
+        }
+
+        .quality-tab.active {
+            background: var(--black-primary);
+            color: var(--white-primary);
+        }
+
+        .quality-tab:hover:not(.active) {
+            background: var(--hover-primary);
+        }
+
+        /* Contrast on green background */
+        .sidebar h2,
+        .sidebar h3,
+        .sidebar p,
+        .sidebar .control-label { color: rgba(255,255,255,0.95) !important; }
+        /* Revert labels to dark on white cards */
+        .text-layer .control-label,
+        .info-box .control-label { color: var(--black-primary) !important; }
+        /* Header upload info */
+        #uploadInfo { color: rgba(255,255,255,0.85) !important; }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: var(--white-primary) !important;
+            border: 2px solid var(--black-primary);
+            border-radius: 6px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--white-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 4px;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--white-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 4px;
+        }
+
+        .toggle {
+            background: var(--white-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 8px;
+        }
+        .toggle { background: var(--white-primary); }
+
+        .toggle::after {
+            width: 20px;
+            height: 20px;
+            top: 2px;
+            left: 2px;
+            background: var(--black-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 6px;
+        }
+
+        .toggle.active { background: #dcfce7; }
+
+        .toggle.active::after { transform: translateX(22px); }
+
+        .radio-option {
+            background: var(--white-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 8px;
+        }
+        .radio-option { background: var(--white-primary); }
+
+        .radio-option:hover { background: #f5f5f5; }
+
+        .radio-option.active {
+            background: #fee2e2;
+            border-color: var(--black-primary);
+            color: var(--black-primary);
+        }
+
+        .quality-square {
+            border: 2px solid var(--black-primary);
+            border-radius: 10px;
+            background: var(--white-primary);
+        }
+
+        .quality-grid { opacity: 0.18; }
+        .quality-grid-line { background: var(--black-primary); }
+
+        .quality-control-point {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--accent-primary);
+            background: var(--white-primary);
+            box-shadow: 3px 3px 0 var(--shadow-primary);
+        }
+
+        .motion-blur-circle {
+            border: 2px solid var(--black-primary);
+            border-radius: 10px;
+            background: var(--white-primary);
+        }
+
+        .motion-blur-point {
+            border: 2px solid var(--black-primary);
+            background: var(--white-primary);
+            border-radius: 6px;
+        }
+
+        .motion-blur-center { background: var(--black-primary); }
+        .motion-blur-trail { background: var(--accent-primary); }
+
+        .crop-box { border: 2px dashed var(--black-primary); }
+        .crop-handle { background: var(--black-primary); border: 2px solid var(--white-primary); border-radius: 3px; }
+
+.preview-image { box-shadow: 6px 6px 0 var(--shadow-primary); }
+
+        .color-option { border: 2px solid var(--black-primary) !important; border-radius: 8px !important; }
+        .color-option.active { outline: 3px solid var(--accent-primary); }
+
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(15,15,15,0.6); }
+        .sidebar::-webkit-scrollbar-track { background: rgba(15,15,15,0.06); }
+
+        .button:disabled,
+        .button-small:disabled { filter: grayscale(60%); box-shadow: none; opacity: 0.6; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--white-primary);
+            color: var(--black-primary);
+            border: 2px solid var(--black-primary);
+            border-radius: 12px;
+            box-shadow: 8px 8px 0 var(--shadow-primary);
+            max-width: 640px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .modal-body { color: var(--black-primary); line-height: 1.5; }
+
+        .modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .modal-footer a {
+            text-decoration: none;
+        }
+
     </style>
 </head>
 <body>
@@ -1146,14 +1361,24 @@
         <div class="main-area">
             <div class="header">
                 <h1>Cromch</h1>
-                <div id="uploadInfo" style="font-size: 0.85rem; color: #666;"></div>
+                <div class="header-right">
+                    <div id="uploadInfo"></div>
+                    <a class="preset-button" id="githubBtn" href="https://github.com/username/Cromch" target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+                       style="padding: 8px 12px; min-height: auto; display: inline-flex; gap: 6px; text-decoration: none;">
+                        <i class="ri-github-line"></i>
+                    </a>
+                    <button class="preset-button" id="infoBtn" style="gap: 6px;">
+                        <i class="ri-information-line"></i>
+                        <span>Info</span>
+                    </button>
+                </div>
             </div>
             
             <div class="image-area">
                 <div class="drop-zone" id="dropZone">
                     <input type="file" id="fileInput" accept="image/*">
-                    <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M12 16V7m0 0l3 3m-3-3l-3 3M2 16a6 6 0 0 1 6-6h1m11 6a6 6 0 0 0-6-6h-1m0 0V4"></path>
+                    <svg class="drop-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M9 16h6v-6h4l-7-7l-7 7h4zm-4 2h14v2H5z"/>
                     </svg>
                     <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Drop your image here</h3>
                     <p style="color: #666; font-size: 0.9rem;">or click to browse • paste from clipboard</p>
@@ -1193,7 +1418,7 @@
             <div class="button-section">
                 <div class="button-group">
                     <div class="button-group-left">
-                        <h3 style="font-size: 1rem; font-weight: 600; color: #d0d0d0; margin: 0;">History</h3>
+                        <h3>History</h3>
                     </div>
                     <div class="button-group-right">
                         <button class="button-small" id="undoBtn" disabled>Undo</button>
@@ -1204,36 +1429,31 @@
             
             <div class="control-section">
                 <div class="toggle-group">
-                    <h3 style="font-size: 1rem; font-weight: 600; color: #d0d0d0; margin: 0;">Crop Image</h3>
+                    <h3>Crop Image</h3>
                     <div class="toggle" id="cropToggle"></div>
                 </div>
             </div>
             
+            <div class="button-section">
+                <div class="button-group">
+                    <div class="button-group-left">
+                        <h3>Quality Settings</h3>
+                    </div>
+                    <div class="button-group-right">
+                        <div class="quality-tabs">
+                            <button class="quality-tab active" id="controlTab"><i class="ri-checkbox-blank-line"></i></button>
+                            <button class="quality-tab" id="sliderTab"><i class="ri-equalizer-3-fill"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="controls">
                 
+
+                
                 <div class="control-section">
-                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #d0d0d0;">Quality Settings</h3>
-                    
-                    <label class="control-label">Presets</label>
-                    <div class="preset-buttons">
-                        <button class="preset-button reset" id="resetBtn">
-                            <i class="ri-refresh-line"></i>
-                        </button>
-                        <button class="preset-button" id="preset1">1</button>
-                        <button class="preset-button" id="preset2">2</button>
-                        <button class="preset-button" id="preset3">3</button>
-                        <button class="preset-button randomizer" id="randomizer">
-                            <i class="ri-dice-line"></i>
-                            <i class="ri-dice-fill"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="quality-tabs">
-                        <button class="quality-tab active" id="sliderTab">Sliders</button>
-                        <button class="quality-tab" id="controlTab">2D Control</button>
-                    </div>
-                    
-                    <div class="quality-sliders" id="qualitySliders">
+                    <div class="quality-sliders hidden" id="qualitySliders">
                         <div class="control-group">
                             <div class="control-header">
                                 <label class="control-label">JPEG Quality</label>
@@ -1279,7 +1499,7 @@
                         </div>
                     </div>
                     
-                    <div class="quality-control-2d" id="qualityControl2D">
+                    <div class="quality-control-2d active" id="qualityControl2D">
                         <div class="quality-square" id="qualitySquare">
                             <div class="quality-grid">
                                 <div class="quality-grid-line vertical" style="left: 25%"></div>
@@ -1295,14 +1515,25 @@
                             <div class="quality-corner-label bottom-right">Bad</div>
                             <div class="quality-control-point" id="qualityControlPoint"></div>
                         </div>
-                        <div style="margin-top: 12px; font-size: 0.8rem; color: #666; text-align: center;">
-                            <div style="margin-bottom: 4px;">
-                                <strong>X-axis:</strong> JPEG Quality • GIF Artifacts
-                            </div>
-                            <div>
-                                <strong>Y-axis:</strong> WEBP Artifacts • Image Scale
-                            </div>
+                        <div style="margin-top: 12px; text-align: center;">
+                            <span class="quality-info-icon">
+                                i
+                                <div class="quality-info-tooltip">
+                                    <div><strong>X-axis:</strong> JPEG Quality • GIF Artifacts</div>
+                                    <div><strong>Y-axis:</strong> WEBP Artifacts • Image Scale</div>
+                                </div>
+                            </span>
                         </div>
+                    </div>
+                    
+                    <div class="preset-buttons">
+                        <button class="button-small reset" id="resetBtn">
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                        <button class="button-small randomizer" id="randomizer">
+                            <i class="ri-dice-line"></i>
+                            <i class="ri-dice-fill"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -1316,7 +1547,7 @@
                         </div>
                     </div>
                     <div class="collapsible-content" id="styleContent">
-                        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #d0d0d0;">Adjustment Settings</h3>
+                        <h3>Adjustment Settings</h3>
                         <div class="control-group">
                             <div class="control-header">
                                 <label class="control-label">Saturation</label>
@@ -1428,6 +1659,27 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="infoModal" aria-modal="true" role="dialog" aria-labelledby="infoTitle">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h3 id="infoTitle">About Cromch</h3>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 10px;">Cromch is a local, client‑side image editor for embracing intentionally "bad" aesthetics. Load an image and tweak:</p>
+                <ul style="margin-left: 18px; margin-bottom: 10px;">
+                    <li>JPEG quality, WEBP/GIF artifacts, and scaling</li>
+                    <li>Adjustments like saturation, contrast, brightness</li>
+                    <li>Optional motion blur and noise</li>
+                    <li>Crop and add text layers</li>
+                </ul>
+                <p style="margin-bottom: 10px;">All processing happens in your browser—no uploads.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="preset-button" id="infoOkBtn" style="flex: 0 0 auto; display: inline-flex;">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let originalImage = null;
         let currentBlob = null;
@@ -1445,7 +1697,7 @@
         let isMotionBlurDragging = false;
         
         // Quality control variables
-        let qualityControl2DActive = false;
+        let qualityControl2DActive = true;
         let qualityControlPosition = { x: 0, y: 0 }; // 0,0 = bottom-left (best quality)
         let isQualityControlDragging = false;
         let slidersModifiedSince2D = false; // Track if sliders changed since last 2D interaction
@@ -1485,9 +1737,6 @@
         const addTextLayerBtn = document.getElementById('addTextLayerBtn');
         
         // Preset elements
-        const preset1Btn = document.getElementById('preset1');
-        const preset2Btn = document.getElementById('preset2');
-        const preset3Btn = document.getElementById('preset3');
         const randomizerBtn = document.getElementById('randomizer');
         
         // Crop confirm buttons
@@ -1601,58 +1850,9 @@
             return 105 - sliderValue;
         }
 
-        // Quality presets (using flipped slider values: left=good, right=bad)
-        const qualityPresets = {
-            1: { // High Quality
-                quality: 1,    // Best JPEG quality
-                webp: 1,       // Best WEBP quality  
-                gif: 1,        // Best GIF quality
-                scale: 5       // 100% scale
-            },
-            2: { // Medium Quality
-                quality: 10,   // Medium JPEG quality
-                webp: 5,       // Medium WEBP quality
-                gif: 10,       // Medium GIF quality
-                scale: 25      // 80% scale
-            },
-            3: { // Low Quality
-                quality: 18,   // Low JPEG quality
-                webp: 8,       // Low WEBP quality
-                gif: 18,       // Low GIF quality
-                scale: 70      // 35% scale
-            }
-        };
 
-        function applyPreset(presetNumber) {
-            const preset = qualityPresets[presetNumber];
-            if (!preset) return;
 
-            // Apply preset values
-            sliders.quality.value = preset.quality;
-            sliders.webp.value = preset.webp;
-            sliders.gif.value = preset.gif;
-            sliders.scale.value = preset.scale;
 
-            // Update slider fills
-            updateSliderFill(sliders.quality);
-            updateSliderFill(sliders.webp);
-            updateSliderFill(sliders.gif);
-            updateSliderFill(sliders.scale);
-
-            // Update 2D control if needed
-            if (qualityControl2DActive) {
-                updateControlPointFromSliders();
-                slidersModifiedSince2D = false;
-            } else {
-                slidersModifiedSince2D = true;
-            }
-
-            // Process image and save state
-            if (originalImage && !isShowingOriginal) {
-                processImage();
-            }
-            saveSettingsState();
-        }
 
         function randomizeQuality() {
             // Add rolling animation
@@ -1731,9 +1931,6 @@
 
 
         // Quality preset event listeners
-        preset1Btn.addEventListener('click', () => applyPreset(1));
-        preset2Btn.addEventListener('click', () => applyPreset(2));
-        preset3Btn.addEventListener('click', () => applyPreset(3));
         randomizerBtn.addEventListener('click', () => randomizeQuality());
 
         // Text layer functions
@@ -2955,7 +3152,7 @@
             appliedCropData = null;
             
             // Reset quality control
-            qualityControl2DActive = false;
+            qualityControl2DActive = true;
             qualityControlPosition = { x: 0, y: 0 };
             slidersModifiedSince2D = false;
             
@@ -2970,20 +3167,13 @@
             // Update UI elements
             cropToggle.classList.remove('active');
             renderTextLayers();
-            sliderTab.classList.add('active');
-            controlTab.classList.remove('active');
-            qualitySliders.classList.remove('hidden');
-            qualityControl2D.classList.remove('active');
+            sliderTab.classList.remove('active');
+            controlTab.classList.add('active');
+            qualitySliders.classList.add('hidden');
+            qualityControl2D.classList.add('active');
             originalToggle.classList.remove('active');
             
-            // Reset text UI
-            textInput.value = '';
-            colorOptions.forEach(option => {
-                option.classList.remove('active');
-                if (option.dataset.color === '#ffffff') {
-                    option.classList.add('active');
-                }
-            });
+            
             
             // Reset motion blur UI
             motionBlurPoint.style.left = '50%';
@@ -3080,6 +3270,40 @@
 
         // Initialize settings on page load
         resetAllSettingsToDefault();
+
+        const infoBtn = document.getElementById('infoBtn');
+        const infoModal = document.getElementById('infoModal');
+        const infoOkBtn = document.getElementById('infoOkBtn');
+
+        function openInfo() {
+            infoModal.classList.add('active');
+            infoOkBtn.focus();
+        }
+
+        function closeInfo() {
+            infoModal.classList.remove('active');
+            infoBtn.focus();
+        }
+
+        infoBtn.addEventListener('click', openInfo);
+        infoOkBtn.addEventListener('click', closeInfo);
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) closeInfo();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeInfo();
+            if (e.key === 'Tab' && infoModal.classList.contains('active')) {
+                const focusable = [infoOkBtn];
+                const idx = focusable.indexOf(document.activeElement);
+                if (e.shiftKey && (idx === 0 || idx === -1)) {
+                    e.preventDefault();
+                    focusable[0].focus();
+                } else if (!e.shiftKey && (idx === focusable.length - 1)) {
+                    e.preventDefault();
+                    focusable[0].focus();
+                }
+            }
+        });
     </script>
 </body>
 </html>
