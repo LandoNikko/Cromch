@@ -539,7 +539,7 @@
             }
             
             #qualitySlidersContainer {
-                display: none;
+                display: none !important;
             }
             
             .crop-presets-wrapper {
@@ -798,8 +798,17 @@
         
         document.addEventListener('mousemove', (e) => {
             if (!isPanelDragging || isMobile()) return;
-            const x = e.clientX - panelDragStart.x;
-            const y = e.clientY - panelDragStart.y;
+            
+            const panelRect = editPanel.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            let x = e.clientX - panelDragStart.x;
+            let y = e.clientY - panelDragStart.y;
+            
+            x = Math.max(0, Math.min(x, viewportWidth - panelRect.width));
+            y = Math.max(0, Math.min(y, viewportHeight - panelRect.height));
+            
             editPanel.style.left = `${x}px`;
             editPanel.style.bottom = 'auto';
             editPanel.style.top = `${y}px`;
