@@ -16,7 +16,6 @@
             --black-primary: #0f0f0f;
             --hover-primary: #ffb95f;
             --shadow-primary: rgba(0, 0, 0, 0.2);
-            --accent-primary: #2563eb;
         }
 
         * {
@@ -96,12 +95,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding-bottom: 250px; /* Space for the panel */
+            padding-bottom: 250px;
         }
 
         .drop-zone {
             padding: 5rem;
-            border: 3px dashed var(--white-primary);
+            border: 5px dashed var(--shadow-primary);
             border-radius: 20px;
             display: flex;
             flex-direction: column;
@@ -109,19 +108,25 @@
             justify-content: center;
             background: var(--white-primary);
             cursor: pointer;
-            box-shadow: 8px 8px 0 var(--shadow-primary);
             text-align: center;
             max-width: 600px;
             width: 90%;
-            transition: transform 0.2s;
+            transition: border-color 0.2s;
         }
 
         .drop-zone:hover {
-            transform: scale(1.02);
+            border-color: var(--black-primary);
         }
-
-        .drop-zone.hidden {
-            display: none;
+        
+        .drop-zone:hover #uploadIcon {
+            animation: uploadBounce 0.6s ease;
+        }
+        
+        @keyframes uploadBounce {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-8px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(-4px); }
         }
 
         .drop-zone input[type="file"] {
@@ -160,7 +165,8 @@
             border: 3px solid var(--black-primary);
             border-radius: 24px;
             padding: 20px 30px;
-            width: auto;
+            width: fit-content;
+            min-width: 650px;
             max-width: 95vw;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             z-index: 100;
@@ -247,14 +253,31 @@
 
         .quality-control-point {
             position: absolute;
-            width: 16px;
-            height: 16px;
-            background: var(--accent-primary);
+            width: 20px;
+            height: 20px;
+            background: var(--black-primary);
             border: 2px solid var(--white-primary);
-            border-radius: 50%;
+            border-radius: 4px;
             transform: translate(-50%, -50%);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            pointer-events: none; /* Let click pass through to container */
+            box-shadow: 2px 2px 0 var(--shadow-primary);
+            pointer-events: none;
+        }
+
+        /* Crop Presets */
+        .crop-presets-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        
+        .crop-presets-wrapper .preset-button {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* Sliders Area */
@@ -285,7 +308,7 @@
             font-size: 0.75rem;
             font-weight: bold;
             margin-bottom: 5px;
-            padding-left: 32px; /* Align with slider track start: 20px label + 12px gap */
+            padding-left: 32px;
         }
 
         .slider-track {
@@ -311,12 +334,12 @@
             -webkit-appearance: none;
             height: 20px;
             width: 20px;
-            border-radius: 4px; /* Square-ish as per mockup */
-            background: var(--white-primary);
-            border: 2px solid var(--black-primary);
-            margin-top: -8px; /* Center thumb */
+            border-radius: 4px;
+            background: var(--shadow-primary);
+            border: 2px solid var(--white-primary);
+            margin-top: -8px;
             cursor: pointer;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            box-shadow: 2px 2px 0 var(--shadow-primary);
         }
         
         input[type=range]::-moz-range-track {
@@ -331,10 +354,10 @@
             height: 16px;
             width: 16px;
             border-radius: 4px;
-            background: var(--white-primary);
-            border: 2px solid var(--black-primary);
+            background: var(--black-primary);
+            border: 2px solid var(--white-primary);
             cursor: pointer;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            box-shadow: 2px 2px 0 var(--shadow-primary);
         }
 
         .preset-button:hover, .action-button:hover {
@@ -370,6 +393,16 @@
         
         .action-button.primary:disabled:hover {
             background: var(--black-primary);
+        }
+        
+        .preset-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .preset-button:disabled:hover {
+            background: var(--white-primary);
+            transform: none;
         }
 
         .crop-container { position: relative; display: inline-block; }
@@ -451,10 +484,13 @@
             
     <div class="main-container">
                 <div class="drop-zone" id="dropZone">
-            <i class="ri-upload-cloud-2-line" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <svg id="uploadIcon" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><title>Upload</title><path fill="currentColor" fill-rule="evenodd" d="M5 16.25a.75.75 0 0 1 .75.75v2c0 .138.112.25.25.25h12a.25.25 0 0 0 .25-.25v-2a.75.75 0 0 1 1.5 0v2A1.75 1.75 0 0 1 18 20.75H6A1.75 1.75 0 0 1 4.25 19v-2a.75.75 0 0 1 .75-.75m5.738-.123a.992.992 0 0 1-.989-.905a36.618 36.618 0 0 1-.08-5.27a42.17 42.17 0 0 1-.741-.048l-1.49-.109a.76.76 0 0 1-.585-1.167a15.555 15.555 0 0 1 4.032-4.258l.597-.429a.888.888 0 0 1 1.036 0l.597.43a15.556 15.556 0 0 1 4.032 4.257a.76.76 0 0 1-.585 1.167l-1.49.109c-.246.018-.493.034-.74.047c.1 1.757.072 3.518-.082 5.27a.992.992 0 0 1-.988.906z" clip-rule="evenodd"/></svg>
             <h3 style="font-size: 1.5rem; margin-bottom: 8px;">Drop your image here</h3>
             <p style="opacity: 0.6; margin-bottom: 20px;">or click to upload • paste from clipboard</p>
-            <button class="preset-button" id="mainBtn">Load Example Image</button>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="preset-button" id="uploadBtn">Upload Image</button>
+                <button class="preset-button" id="mainBtn">Load Example Image</button>
+            </div>
                     <input type="file" id="fileInput" accept="image/*">
                 </div>
                 
@@ -479,7 +515,7 @@
         
     <div class="edit-panel" id="editPanel" style="display: none;">
         <div class="panel-content">
-            <div class="quality-control-wrapper">
+            <div class="quality-control-wrapper" id="qualityControlWrapper">
                 <div class="quality-control-2d" id="qualityControl2D">
                             <div class="quality-grid">
                                 <div class="quality-grid-line vertical" style="left: 25%"></div>
@@ -497,6 +533,7 @@
                         </div>
                     </div>
                     
+                    
             <div class="sliders-container">
                 <div class="panel-header">
                     <h3 id="panelTitle">Edit Panel</h3>
@@ -513,35 +550,41 @@
                 </div>
                         </div>
                         
-                <div class="slider-labels-top">
-                                    <span>Good</span>
-                                    <span>Bad</span>
-                        </div>
+                <div class="crop-presets-wrapper" id="cropPresetsWrapper" style="display: none;">
+                    <button class="preset-button" id="returnToOriginal">Return to Original Crop</button>
+                </div>
                         
-                <div class="slider-group">
-                    <div class="slider-label">A</div> <!-- JPEG -->
-                    <div class="slider-track">
-                        <input type="range" id="quality" min="1" max="20" value="1">
+                <div id="qualitySlidersContainer">
+                    <div class="slider-labels-top">
+                                        <span>Good</span>
+                                        <span>Bad</span>
+                            </div>
+                            
+                    <div class="slider-group">
+                        <div class="slider-label">A</div> <!-- JPEG -->
+                        <div class="slider-track">
+                            <input type="range" id="quality" min="1" max="20" value="1">
+                                    </div>
+                                </div>
+                    <div class="slider-group">
+                        <div class="slider-label">B</div> <!-- WEBP -->
+                        <div class="slider-track">
+                            <input type="range" id="webp" min="1" max="10" value="1">
+                            </div>
+                                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">C</div> <!-- GIF -->
+                        <div class="slider-track">
+                            <input type="range" id="gif" min="1" max="20" value="1">
                                 </div>
                             </div>
-                <div class="slider-group">
-                    <div class="slider-label">B</div> <!-- WEBP -->
-                    <div class="slider-track">
-                        <input type="range" id="webp" min="1" max="10" value="1">
-                        </div>
-                                </div>
-                <div class="slider-group">
-                    <div class="slider-label">C</div> <!-- GIF -->
-                    <div class="slider-track">
-                        <input type="range" id="gif" min="1" max="20" value="1">
+                    <div class="slider-group">
+                        <div class="slider-label">D</div> <!-- Scale -->
+                        <div class="slider-track">
+                            <input type="range" id="scale" min="5" max="100" step="5" value="5">
+                                    </div>
                             </div>
-                        </div>
-                <div class="slider-group">
-                    <div class="slider-label">D</div> <!-- Scale -->
-                    <div class="slider-track">
-                        <input type="range" id="scale" min="5" max="100" step="5" value="5">
-                                </div>
-                        </div>
+                </div>
                         
                 <button class="action-button primary" id="downloadBtn">Download Image</button>
                         </div>
@@ -571,6 +614,7 @@
         let cropEnabled = false;
         let cropData = { x: 0, y: 0, width: 0, height: 0 };
         let appliedCropData = null;
+        let cropStateSnapshot = null;
         let isDragging = false;
         let isResizing = false;
         let dragStart = { x: 0, y: 0 };
@@ -582,6 +626,7 @@
 
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
         const mainBtn = document.getElementById('mainBtn');
         const previewContainer = document.getElementById('previewContainer');
         const previewImage = document.getElementById('previewImage');
@@ -595,6 +640,9 @@
         const cancelCropPanel = document.getElementById('cancelCropPanel');
         const qualityControl2D = document.getElementById('qualityControl2D');
         const qualityControlPoint = document.getElementById('qualityControlPoint');
+        const qualitySlidersContainer = document.getElementById('qualitySlidersContainer');
+        const cropPresetsWrapper = document.getElementById('cropPresetsWrapper');
+        const returnToOriginal = document.getElementById('returnToOriginal');
         const downloadBtn = document.getElementById('downloadBtn');
         const panelTitle = document.getElementById('panelTitle');
         const sliders = {
@@ -612,11 +660,9 @@
         infoModal.addEventListener('click', e => e.target === infoModal && infoModal.classList.remove('active'));
         document.querySelector('.header h1').onclick = () => location.reload();
         dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.transform = 'scale(1.05)'; });
-        dropZone.addEventListener('dragleave', () => { dropZone.style.transform = 'scale(1)'; });
+        dropZone.addEventListener('dragover', e => e.preventDefault());
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.style.transform = 'scale(1)';
             if (e.dataTransfer.files.length) handleImageFile(e.dataTransfer.files[0]);
         });
         fileInput.addEventListener('change', (e) => {
@@ -631,6 +677,11 @@
                     break;
                 }
             }
+        });
+
+        uploadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
         });
 
         mainBtn.addEventListener('click', (e) => {
@@ -704,7 +755,6 @@
         });
 
         document.addEventListener('mousemove', e => isQualityControlDragging && handleGridMove(e));
-        document.addEventListener('mouseup', () => isQualityControlDragging = false);
 
         function handleGridMove(e) {
             const rect = qualityControl2D.getBoundingClientRect();
@@ -728,8 +778,19 @@
             });
         });
             
+        const updateReturnButton = () => {
+            if (appliedCropData) {
+                returnToOriginal.textContent = 'Return to Original Crop';
+                returnToOriginal.disabled = false;
+            } else {
+                returnToOriginal.innerHTML = '<i class="ri-check-line"></i> Default';
+                returnToOriginal.disabled = true;
+            }
+        };
+        
         cropToggle.addEventListener('click', () => {
             if (!originalImage) return;
+            cropStateSnapshot = appliedCropData ? { ...appliedCropData } : null;
             cropEnabled = true;
             cropOverlay.classList.add('active');
             cropBox.style.display = 'block';
@@ -737,6 +798,9 @@
             cropToggle.style.display = 'none';
             cropButtons.style.display = 'flex';
             panelTitle.textContent = 'Edit Crop';
+            qualitySlidersContainer.style.display = 'none';
+            cropPresetsWrapper.style.display = 'flex';
+            updateReturnButton();
         });
 
         const initCropBox = () => {
@@ -825,7 +889,10 @@
             }
         });
 
-        document.addEventListener('mouseup', () => isDragging = isResizing = false);
+        document.addEventListener('mouseup', () => {
+            isDragging = isResizing = false;
+            isQualityControlDragging = false;
+        });
 
         const cropDarkTop = document.getElementById('cropDarkTop');
         const cropDarkLeft = document.getElementById('cropDarkLeft');
@@ -835,8 +902,12 @@
         function updateCropDarkness() {
             const imgRect = previewImage.getBoundingClientRect();
             const boxRect = cropBox.getBoundingClientRect();
-            const scaleX = originalImage.width / imgRect.width;
-            const scaleY = originalImage.height / imgRect.height;
+            
+            const currentWidth = appliedCropData ? appliedCropData.width : originalImage.width;
+            const currentHeight = appliedCropData ? appliedCropData.height : originalImage.height;
+            
+            const scaleX = currentWidth / imgRect.width;
+            const scaleY = currentHeight / imgRect.height;
             
             cropData = {
                 x: (boxRect.left - imgRect.left) * scaleX,
@@ -858,25 +929,69 @@
             Object.assign(cropDarkBottom.style, {left: '0', bottom: '0', width: '100%', height: b + 'px'});
         }
 
-        const exitCropMode = () => {
+        const exitCropMode = (restore = false) => {
+            if (restore) {
+                appliedCropData = cropStateSnapshot;
+                processImage();
+            }
+            cropStateSnapshot = null;
             cropEnabled = false;
             cropOverlay.classList.remove('active');
             cropBox.style.display = 'none';
             cropButtons.style.display = 'none';
             cropToggle.style.display = 'block';
             panelTitle.textContent = 'Edit Panel';
+            qualitySlidersContainer.style.display = 'block';
+            cropPresetsWrapper.style.display = 'none';
         };
         
         const applyCrop = () => {
-            appliedCropData = { ...cropData };
+            if (appliedCropData) {
+                appliedCropData = {
+                    x: appliedCropData.x + cropData.x,
+                    y: appliedCropData.y + cropData.y,
+                    width: cropData.width,
+                    height: cropData.height
+                };
+            } else {
+                appliedCropData = { ...cropData };
+            }
+            
+            if (appliedCropData.x === 0 && appliedCropData.y === 0 && 
+                appliedCropData.width === originalImage.width && 
+                appliedCropData.height === originalImage.height) {
+                appliedCropData = null;
+            }
+            
             exitCropMode();
             processImage();
         };
         
-        const cancelCrop = () => exitCropMode();
+        const cancelCrop = () => exitCropMode(true);
         
         applyCropPanel.addEventListener('click', applyCrop);
         cancelCropPanel.addEventListener('click', cancelCrop);
+        
+        returnToOriginal.addEventListener('click', async () => {
+            if (!originalImage || !appliedCropData) return;
+            
+            appliedCropData = null;
+            updateReturnButton();
+            await processImage();
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const imgRect = previewImage.getBoundingClientRect();
+            
+            Object.assign(cropBox.style, {
+                left: '0px',
+                top: '0px',
+                width: `${imgRect.width}px`,
+                height: `${imgRect.height}px`
+            });
+            
+            updateCropDarkness();
+        });
 
         async function processImage() {
             if (!originalImage) return;
@@ -977,7 +1092,8 @@
         
         downloadBtn.addEventListener('click', () => {
             if (!currentImageUrl || downloadBtn.disabled) return;
-            Object.assign(document.createElement('a'), {href: currentImageUrl, download: 'cromch.jpg'}).click();
+            const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+            Object.assign(document.createElement('a'), {href: currentImageUrl, download: `cromch_${randomSuffix}.jpg`}).click();
         });
 
         function applyGifArtifacts(ctx, width, height, quality) {
