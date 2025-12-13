@@ -141,7 +141,7 @@
         }
 
         .preview-container.active {
-            display: block;
+            display: inline-block;
         }
 
         .preview-image {
@@ -495,8 +495,7 @@
             }
             
             .preview-container {
-                width: 95vw;
-                height: auto;
+                max-width: 95vw;
             }
             
             .edit-panel {
@@ -557,7 +556,7 @@
             
             .crop-presets-wrapper .preset-button span,
             #downloadBtn span {
-                display: none;
+            display: none;
             }
             
             .crop-presets-wrapper .preset-button i,
@@ -567,22 +566,22 @@
             }
             
             .crop-controls {
-                display: flex;
+            display: flex;
                 flex-direction: column;
                 gap: 8px;
                 order: 1;
             }
             
             .crop-buttons {
-                display: flex;
-                gap: 8px;
-            }
-            
+            display: flex;
+            gap: 8px;
+        }
+
             #downloadBtn {
                 order: 3;
                 margin-top: auto;
-            }
-            
+        }
+
             .action-button {
                 justify-content: center;
             }
@@ -636,7 +635,7 @@
     <div class="edit-panel" id="editPanel" style="display: none;">
         <div class="panel-drag-handle" id="panelDragHandle">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>Grab-vertical SVG Icon</title><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"><circle cx="5.5" cy="2.5" r=".75"/><circle cx="5.5" cy="8" r=".75"/><circle cx="5.5" cy="13.5" r=".75"/><circle cx="10.496" cy="2.5" r=".75"/><circle cx="10.496" cy="8" r=".75"/><circle cx="10.496" cy="13.5" r=".75"/></g></svg>
-        </div>
+            </div>
         <div class="panel-content">
             <div class="quality-control-wrapper" id="qualityControlWrapper">
                 <div class="quality-control-2d" id="qualityControl2D">
@@ -1013,7 +1012,7 @@
                 const touch = e.touches[0];
                 dragStart = { x: touch.clientX, y: touch.clientY };
                 e.stopPropagation();
-                e.preventDefault();
+            e.preventDefault();
             });
         });
 
