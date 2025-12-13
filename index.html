@@ -166,8 +166,6 @@
             border-radius: 24px;
             padding: 20px 30px;
             width: fit-content;
-            min-width: 650px;
-            max-width: 95vw;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             z-index: 100;
             color: var(--white-primary);
@@ -386,7 +384,7 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
+
         .action-button:disabled:hover {
             background: var(--white-primary);
         }
@@ -445,26 +443,110 @@
         .modal-footer { display: flex; justify-content: flex-end; margin-top: 20px; }
 
         @media (max-width: 768px) {
+            .header {
+                padding: 12px;
+                justify-content: flex-start;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header-right {
+                right: 12px;
+                gap: 6px;
+            }
+            
+            .preview-container {
+                width: 95vw;
+                height: auto;
+            }
+            
             .edit-panel {
-                width: 95%;
-                padding: 15px;
+                padding: 12px;
+                min-width: auto;
             }
+            
             .panel-content {
-                gap: 15px;
+                display: flex;
+                flex-direction: row;
+                gap: 12px;
+                align-items: flex-start;
             }
+            
             .quality-control-wrapper {
-                width: 200px;
-                height: 200px;
+                width: 180px;
+                height: 180px;
+                flex-shrink: 0;
             }
+            
+            .quality-control-2d {
+                touch-action: none;
+            }
+            
             .sliders-container {
-                min-height: 200px;
+                display: flex;
+                flex-direction: column;
+                min-height: 180px;
+                gap: 8px;
+                align-items: flex-start;
             }
-            .slider-label {
-                font-size: 0.95rem;
-                width: 18px;
+            
+            .panel-header {
+                display: flex;
+                margin-bottom: 0;
             }
-            .slider-labels-top {
-                padding-left: 30px;
+            
+            .panel-header h3 {
+                display: none;
+            }
+            
+            #qualitySlidersContainer {
+                display: none;
+            }
+            
+            .crop-presets-wrapper {
+                padding: 0;
+                order: 2;
+            }
+            
+            .crop-presets-wrapper .preset-button,
+            #cropToggle,
+            .crop-buttons button,
+            #downloadBtn {
+                padding: 10px;
+            }
+            
+            .crop-presets-wrapper .preset-button span,
+            #downloadBtn span {
+                display: none;
+            }
+            
+            .crop-presets-wrapper .preset-button i,
+            #downloadBtn i {
+                font-size: 1.4rem;
+                margin: 0;
+            }
+            
+            .crop-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                order: 1;
+            }
+            
+            .crop-buttons {
+                display: flex;
+                gap: 8px;
+            }
+            
+            #downloadBtn {
+                order: 3;
+                margin-top: auto;
+            }
+            
+            .action-button {
+                justify-content: center;
             }
         }
     </style>
@@ -542,55 +624,55 @@
                         <div class="crop-buttons" id="cropButtons" style="display: none;">
                             <button class="action-button primary" id="applyCropPanel">
                                 <i class="ri-check-line"></i>
-                            </button>
+                        </button>
                             <button class="action-button" id="cancelCropPanel">
                                 <i class="ri-close-line"></i>
-                            </button>
+                        </button>
                     </div>
                 </div>
                         </div>
                         
                 <div class="crop-presets-wrapper" id="cropPresetsWrapper" style="display: none;">
                     <button class="preset-button" id="returnToOriginal">Return to Original Crop</button>
-                </div>
+                        </div>
                         
                 <div id="qualitySlidersContainer">
                     <div class="slider-labels-top">
-                                        <span>Good</span>
-                                        <span>Bad</span>
-                            </div>
-                            
+                                    <span>Good</span>
+                                    <span>Bad</span>
+                        </div>
+                        
                     <div class="slider-group">
                         <div class="slider-label">A</div> <!-- JPEG -->
                         <div class="slider-track">
                             <input type="range" id="quality" min="1" max="20" value="1">
-                                    </div>
                                 </div>
+                            </div>
                     <div class="slider-group">
                         <div class="slider-label">B</div> <!-- WEBP -->
                         <div class="slider-track">
                             <input type="range" id="webp" min="1" max="10" value="1">
-                            </div>
-                                    </div>
+                        </div>
+                                </div>
                     <div class="slider-group">
                         <div class="slider-label">C</div> <!-- GIF -->
                         <div class="slider-track">
                             <input type="range" id="gif" min="1" max="20" value="1">
-                                </div>
                             </div>
+                        </div>
                     <div class="slider-group">
                         <div class="slider-label">D</div> <!-- Scale -->
                         <div class="slider-track">
                             <input type="range" id="scale" min="5" max="100" step="5" value="5">
-                                    </div>
-                            </div>
-                </div>
-                        
-                <button class="action-button primary" id="downloadBtn">Download Image</button>
                         </div>
                     </div>
                 </div>
                 
+                <button class="action-button primary" id="downloadBtn"><i class="ri-download-line"></i><span>Download Image</span></button>
+                    </div>
+                </div>
+            </div>
+            
     <!-- Info Modal -->
     <div class="modal-overlay" id="infoModal">
         <div class="modal-content">
@@ -620,9 +702,11 @@
         let dragStart = { x: 0, y: 0 };
         let resizeHandle = null;
         
-        let qualityControlPosition = { x: 0, y: 0 }; // 0,0 = bottom-left (best quality)
+        let qualityControlPosition = { x: 0, y: 0 };
         let isQualityControlDragging = false;
         let slidersModifiedSince2D = false;
+        
+        const isMobile = () => window.innerWidth <= 768;
 
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
@@ -753,8 +837,23 @@
             isQualityControlDragging = true;
             handleGridMove(e);
         });
+        
+        qualityControl2D.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isQualityControlDragging = true;
+            handleGridMove(e.touches[0]);
+        });
 
         document.addEventListener('mousemove', e => isQualityControlDragging && handleGridMove(e));
+        
+        document.addEventListener('touchmove', e => {
+            if (isQualityControlDragging) {
+                e.preventDefault();
+                handleGridMove(e.touches[0]);
+            }
+        }, { passive: false });
+        
+        document.addEventListener('touchend', () => isQualityControlDragging = false);
 
         function handleGridMove(e) {
             const rect = qualityControl2D.getBoundingClientRect();
@@ -770,21 +869,23 @@
                 slidersModifiedSince2D = true;
                 originalImage && processImage();
             });
-            slider.addEventListener('change', () => {
+                slider.addEventListener('change', () => {
                 if (slidersModifiedSince2D) {
                     updateControlPointFromSliders();
                     slidersModifiedSince2D = false;
-                }
+                    }
+                });
             });
-        });
             
         const updateReturnButton = () => {
             if (appliedCropData) {
-                returnToOriginal.textContent = 'Return to Original Crop';
+                returnToOriginal.innerHTML = '<i class="ri-fullscreen-line"></i><span>Return to Original Crop</span>';
                 returnToOriginal.disabled = false;
+                cropPresetsWrapper.style.display = 'flex';
             } else {
-                returnToOriginal.innerHTML = '<i class="ri-check-line"></i> Default';
+                returnToOriginal.innerHTML = '<i class="ri-check-line"></i><span>Default</span>';
                 returnToOriginal.disabled = true;
+                if (isMobile()) cropPresetsWrapper.style.display = 'none';
             }
         };
         
@@ -932,8 +1033,8 @@
         const exitCropMode = (restore = false) => {
             if (restore) {
                 appliedCropData = cropStateSnapshot;
-                processImage();
-            }
+                    processImage();
+                }
             cropStateSnapshot = null;
             cropEnabled = false;
             cropOverlay.classList.remove('active');
@@ -941,7 +1042,7 @@
             cropButtons.style.display = 'none';
             cropToggle.style.display = 'block';
             panelTitle.textContent = 'Edit Panel';
-            qualitySlidersContainer.style.display = 'block';
+            if (!isMobile()) qualitySlidersContainer.style.display = 'block';
             cropPresetsWrapper.style.display = 'none';
         };
         
@@ -998,14 +1099,14 @@
             downloadBtn.disabled = true;
 
             try {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                const scalePercent = mapScaleValue(parseInt(sliders.scale.value)) / 100;
-                
-                let sourceX = 0, sourceY = 0, sourceWidth = originalImage.width, sourceHeight = originalImage.height;
-                
-                if (appliedCropData) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const scalePercent = mapScaleValue(parseInt(sliders.scale.value)) / 100;
+            
+            let sourceX = 0, sourceY = 0, sourceWidth = originalImage.width, sourceHeight = originalImage.height;
+            
+            if (appliedCropData) {
                     sourceX = Math.max(0, appliedCropData.x);
                     sourceY = Math.max(0, appliedCropData.y);
                     sourceWidth = Math.min(originalImage.width - sourceX, appliedCropData.width);
@@ -1024,49 +1125,49 @@
                 
                 ctx.drawImage(originalImage, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
 
-                const gifQuality = mapGifValue(parseInt(sliders.gif.value));
-                if (gifQuality < 100) {
+            const gifQuality = mapGifValue(parseInt(sliders.gif.value));
+            if (gifQuality < 100) {
                     applyGifArtifacts(ctx, canvas.width, canvas.height, gifQuality);
-                }
+            }
 
-                const webpQuality = mapWebpValue(parseInt(sliders.webp.value)) / 100;
-                if (webpQuality < 1.0) {
+            const webpQuality = mapWebpValue(parseInt(sliders.webp.value)) / 100;
+            if (webpQuality < 1.0) {
                     const webpBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', webpQuality));
-                    
+                
                     if (webpBlob) {
-                        const webpUrl = URL.createObjectURL(webpBlob);
-                        const webpImg = new Image();
+                const webpUrl = URL.createObjectURL(webpBlob);
+                const webpImg = new Image();
                         webpImg.crossOrigin = 'anonymous';
                         
                         await new Promise((resolve, reject) => {
-                            webpImg.onload = resolve;
+                    webpImg.onload = resolve;
                             webpImg.onerror = reject;
-                            webpImg.src = webpUrl;
+                    webpImg.src = webpUrl;
                         }).catch(() => {});
-                        
+                
                         if (webpImg.complete && webpImg.naturalWidth > 0) {
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            ctx.drawImage(webpImg, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(webpImg, 0, 0);
                         }
                         
                         URL.revokeObjectURL(webpUrl);
                     }
                 }
 
-                const targetWidth = 1000;
-                const aspectRatio = canvas.height / canvas.width;
-                const targetHeight = Math.round(targetWidth * aspectRatio);
-                
-                const finalCanvas = document.createElement('canvas');
-                const finalCtx = finalCanvas.getContext('2d');
-                finalCanvas.width = targetWidth;
-                finalCanvas.height = targetHeight;
+            const targetWidth = 1000;
+            const aspectRatio = canvas.height / canvas.width;
+            const targetHeight = Math.round(targetWidth * aspectRatio);
+            
+            const finalCanvas = document.createElement('canvas');
+            const finalCtx = finalCanvas.getContext('2d');
+            finalCanvas.width = targetWidth;
+            finalCanvas.height = targetHeight;
                 finalCtx.imageSmoothingEnabled = false;
-                finalCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+            finalCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
 
-                const quality = mapQualityValue(parseInt(sliders.quality.value)) / 100;
+            const quality = mapQualityValue(parseInt(sliders.quality.value)) / 100;
                 
-                finalCanvas.toBlob((blob) => {
+            finalCanvas.toBlob((blob) => {
                     if (!blob) {
                         downloadBtn.disabled = false;
                         return;
@@ -1075,16 +1176,16 @@
                     if (currentImageUrl) URL.revokeObjectURL(currentImageUrl);
                     currentImageUrl = URL.createObjectURL(blob);
                     
-                    const tempImg = new Image();
-                    tempImg.onload = () => {
+                const tempImg = new Image();
+                tempImg.onload = () => {
                         previewImage.src = currentImageUrl;
                         downloadBtn.disabled = false;
-                    };
+                };
                     tempImg.onerror = () => {
                         downloadBtn.disabled = false;
                     };
                     tempImg.src = currentImageUrl;
-                }, 'image/jpeg', quality);
+            }, 'image/jpeg', quality);
             } catch (error) {
                 downloadBtn.disabled = false;
             }
