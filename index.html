@@ -17,8 +17,6 @@
             --hover-primary: #ffb95f;
             --shadow-primary: rgba(0, 0, 0, 0.2);
             --accent-primary: #2563eb;
-            --color-danger: #ef4444;
-            --color-success: #84cc16;
         }
 
         * {
@@ -111,7 +109,7 @@
             justify-content: center;
             background: var(--white-primary);
             cursor: pointer;
-            box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+            box-shadow: 8px 8px 0 var(--shadow-primary);
             text-align: center;
             max-width: 600px;
             width: 90%;
@@ -147,8 +145,8 @@
             display: block;
             border: 3px solid var(--black-primary);
             border-radius: 4px;
-            box-shadow: 8px 8px 0 rgba(0,0,0,0.2);
-            background: #fff;
+            box-shadow: 8px 8px 0 var(--shadow-primary);
+            background: var(--white-primary);
             object-fit: contain;
         }
 
@@ -197,10 +195,16 @@
             display: flex;
             gap: 8px;
         }
-        
+
         .crop-buttons {
             display: flex;
-            gap: 8px;
+            gap: 4px;
+        }
+        
+        .crop-buttons button {
+            padding: 4px 10px;
+            gap: 0;
+            font-size: 1.3rem;
         }
 
         .quality-control-2d {
@@ -333,38 +337,47 @@
             box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
         }
 
-        .action-button:hover {
-            transform: translateY(-1px);
+        .preset-button:hover, .action-button:hover {
+            background: var(--hover-primary);
         }
 
         .action-button.primary {
-            background: #2d3436;
-            color: #fff;
+            background: var(--black-primary);
+            color: var(--white-primary);
+        }
+        
+        .action-button.primary:hover {
+            background: var(--hover-primary);
+            color: var(--black-primary);
+        }
+        
+        #downloadBtn {
             width: 100%;
             margin-top: auto;
             padding: 14px;
             font-size: 1rem;
+            justify-content: center;
         }
         
         .action-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none !important;
+        }
+        
+        .action-button:disabled:hover {
+            background: var(--white-primary);
+        }
+        
+        .action-button.primary:disabled:hover {
+            background: var(--black-primary);
         }
 
-        .crop-active {
-            background: #ff6b6b;
-            color: white;
-            border-color: #000;
-        }
-
-        /* Crop Styles (Copied) */
         .crop-container { position: relative; display: inline-block; }
         .crop-overlay { position: absolute; inset: 0; pointer-events: none; display: none; }
         .crop-overlay.active { display: block; pointer-events: auto; }
         .crop-dark { position: absolute; background: rgba(0, 0, 0, 0.6); }
-        .crop-box { position: absolute; border: 2px dashed #fff; cursor: move; box-shadow: 0 0 0 1px #000; }
-        .crop-handle { position: absolute; width: 10px; height: 10px; background: #fff; border: 1px solid #000; }
+        .crop-box { position: absolute; border: 2px dashed var(--white-primary); cursor: move; box-shadow: 0 0 0 1px var(--black-primary); }
+        .crop-handle { position: absolute; width: 10px; height: 10px; background: var(--white-primary); border: 1px solid var(--black-primary); }
         .nw { top: -5px; left: -5px; cursor: nw-resize; }
         .ne { top: -5px; right: -5px; cursor: ne-resize; }
         .sw { bottom: -5px; left: -5px; cursor: sw-resize; }
@@ -405,7 +418,6 @@
             }
             .panel-content {
                 gap: 15px;
-                /* Keep the same grid layout */
             }
             .quality-control-wrapper {
                 width: 200px;
@@ -428,7 +440,7 @@
             <div class="header">
                 <h1>Cromch</h1>
                 <div class="header-right">
-            <a class="preset-button" href="https://github.com/username/Cromch" target="_blank">
+            <a class="preset-button" href="https://github.com/LandoNikko/Cromch" target="_blank">
                         <i class="ri-github-line"></i>
                     </a>
             <button class="preset-button" id="infoBtn">
@@ -441,7 +453,7 @@
                 <div class="drop-zone" id="dropZone">
             <i class="ri-upload-cloud-2-line" style="font-size: 3rem; margin-bottom: 1rem;"></i>
             <h3 style="font-size: 1.5rem; margin-bottom: 8px;">Drop your image here</h3>
-            <p style="color: #666; margin-bottom: 20px;">or click to upload • paste from clipboard</p>
+            <p style="opacity: 0.6; margin-bottom: 20px;">or click to upload • paste from clipboard</p>
             <button class="preset-button" id="mainBtn">Load Example Image</button>
                     <input type="file" id="fileInput" accept="image/*">
                 </div>
@@ -487,12 +499,16 @@
                     
             <div class="sliders-container">
                 <div class="panel-header">
-                    <h3>Edit Panel</h3>
+                    <h3 id="panelTitle">Edit Panel</h3>
                     <div class="crop-controls">
                         <button class="action-button" id="cropToggle">Crop</button>
                         <div class="crop-buttons" id="cropButtons" style="display: none;">
-                            <button class="action-button" id="applyCropPanel" style="background: #4ade80; color: var(--black-primary); border-color: var(--black-primary);">Apply</button>
-                            <button class="action-button" id="cancelCropPanel">Cancel</button>
+                            <button class="action-button primary" id="applyCropPanel">
+                                <i class="ri-check-line"></i>
+                            </button>
+                            <button class="action-button" id="cancelCropPanel">
+                                <i class="ri-close-line"></i>
+                            </button>
                     </div>
                 </div>
                         </div>
@@ -527,7 +543,7 @@
                                 </div>
                         </div>
                         
-                <button class="action-button primary" id="downloadBtn">Download JPG</button>
+                <button class="action-button primary" id="downloadBtn">Download Image</button>
                         </div>
                     </div>
                 </div>
@@ -580,6 +596,7 @@
         const qualityControl2D = document.getElementById('qualityControl2D');
         const qualityControlPoint = document.getElementById('qualityControlPoint');
         const downloadBtn = document.getElementById('downloadBtn');
+        const panelTitle = document.getElementById('panelTitle');
         const sliders = {
             quality: document.getElementById('quality'),
             webp: document.getElementById('webp'),
@@ -649,7 +666,7 @@
                     
                     requestAnimationFrame(() => {
                         updateQualityControlPoint();
-                        processImage();
+                processImage();
                     });
                 };
                 img.src = e.target.result;
@@ -719,6 +736,7 @@
             initCropBox();
             cropToggle.style.display = 'none';
             cropButtons.style.display = 'flex';
+            panelTitle.textContent = 'Edit Crop';
         });
 
         const initCropBox = () => {
@@ -743,53 +761,63 @@
 
         document.addEventListener('mousemove', (e) => {
             if (!cropEnabled) return;
-            const containerRect = cropContainer.getBoundingClientRect();
+            
             const imgRect = previewImage.getBoundingClientRect();
+            const containerRect = cropContainer.getBoundingClientRect();
+            const imgWidth = imgRect.width;
+            const imgHeight = imgRect.height;
             
             if (isDragging) {
                 let left = e.clientX - dragStart.x;
                 let top = e.clientY - dragStart.y;
+                
+                left = Math.max(0, Math.min(left, imgWidth - cropBox.offsetWidth));
+                top = Math.max(0, Math.min(top, imgHeight - cropBox.offsetHeight));
+                
                 cropBox.style.left = left + 'px';
                 cropBox.style.top = top + 'px';
                 updateCropDarkness();
             } else if (isResizing) {
-                const containerRect = cropContainer.getBoundingClientRect();
                 const mouseX = e.clientX - containerRect.left;
                 const mouseY = e.clientY - containerRect.top;
                 
                 const minSize = 20;
                 
                 if (resizeHandle.classList.contains('se')) {
-                    const newWidth = Math.max(minSize, mouseX - cropBox.offsetLeft);
-                    const newHeight = Math.max(minSize, mouseY - cropBox.offsetTop);
+                    const newWidth = Math.max(minSize, Math.min(mouseX - cropBox.offsetLeft, imgWidth - cropBox.offsetLeft));
+                    const newHeight = Math.max(minSize, Math.min(mouseY - cropBox.offsetTop, imgHeight - cropBox.offsetTop));
                     cropBox.style.width = newWidth + 'px';
                     cropBox.style.height = newHeight + 'px';
                 } else if (resizeHandle.classList.contains('sw')) {
                     const rightEdge = cropBox.offsetLeft + cropBox.offsetWidth;
-                    const newWidth = Math.max(minSize, rightEdge - mouseX);
-                    if (newWidth > minSize) cropBox.style.left = mouseX + 'px';
+                    const newLeft = Math.max(0, mouseX);
+                    const newWidth = Math.max(minSize, rightEdge - newLeft);
+                    if (newWidth > minSize) cropBox.style.left = newLeft + 'px';
                     cropBox.style.width = newWidth + 'px';
-                    const newHeight = Math.max(minSize, mouseY - cropBox.offsetTop);
+                    const newHeight = Math.max(minSize, Math.min(mouseY - cropBox.offsetTop, imgHeight - cropBox.offsetTop));
                     cropBox.style.height = newHeight + 'px';
                 } else if (resizeHandle.classList.contains('ne')) {
                     const bottomEdge = cropBox.offsetTop + cropBox.offsetHeight;
-                    const newHeight = Math.max(minSize, bottomEdge - mouseY);
-                    if (newHeight > minSize) cropBox.style.top = mouseY + 'px';
+                    const newTop = Math.max(0, mouseY);
+                    const newHeight = Math.max(minSize, bottomEdge - newTop);
+                    if (newHeight > minSize) cropBox.style.top = newTop + 'px';
                     cropBox.style.height = newHeight + 'px';
-                    const newWidth = Math.max(minSize, mouseX - cropBox.offsetLeft);
+                    const newWidth = Math.max(minSize, Math.min(mouseX - cropBox.offsetLeft, imgWidth - cropBox.offsetLeft));
                     cropBox.style.width = newWidth + 'px';
                 } else if (resizeHandle.classList.contains('nw')) {
                     const rightEdge = cropBox.offsetLeft + cropBox.offsetWidth;
                     const bottomEdge = cropBox.offsetTop + cropBox.offsetHeight;
-                    const newWidth = Math.max(minSize, rightEdge - mouseX);
-                    const newHeight = Math.max(minSize, bottomEdge - mouseY);
+                    const newLeft = Math.max(0, mouseX);
+                    const newTop = Math.max(0, mouseY);
+                    const newWidth = Math.max(minSize, rightEdge - newLeft);
+                    const newHeight = Math.max(minSize, bottomEdge - newTop);
                     
                     if (newWidth > minSize) {
-                        cropBox.style.left = mouseX + 'px';
+                        cropBox.style.left = newLeft + 'px';
                         cropBox.style.width = newWidth + 'px';
                     }
                     if (newHeight > minSize) {
-                        cropBox.style.top = mouseY + 'px';
+                        cropBox.style.top = newTop + 'px';
                         cropBox.style.height = newHeight + 'px';
                     }
                 }
@@ -836,6 +864,7 @@
             cropBox.style.display = 'none';
             cropButtons.style.display = 'none';
             cropToggle.style.display = 'block';
+            panelTitle.textContent = 'Edit Panel';
         };
         
         const applyCrop = () => {
@@ -854,14 +883,14 @@
             downloadBtn.disabled = true;
 
             try {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const scalePercent = mapScaleValue(parseInt(sliders.scale.value)) / 100;
-            
-            let sourceX = 0, sourceY = 0, sourceWidth = originalImage.width, sourceHeight = originalImage.height;
-            
-            if (appliedCropData) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const scalePercent = mapScaleValue(parseInt(sliders.scale.value)) / 100;
+                
+                let sourceX = 0, sourceY = 0, sourceWidth = originalImage.width, sourceHeight = originalImage.height;
+                
+                if (appliedCropData) {
                     sourceX = Math.max(0, appliedCropData.x);
                     sourceY = Math.max(0, appliedCropData.y);
                     sourceWidth = Math.min(originalImage.width - sourceX, appliedCropData.width);
@@ -880,49 +909,49 @@
                 
                 ctx.drawImage(originalImage, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvas.width, canvas.height);
 
-            const gifQuality = mapGifValue(parseInt(sliders.gif.value));
-            if (gifQuality < 100) {
+                const gifQuality = mapGifValue(parseInt(sliders.gif.value));
+                if (gifQuality < 100) {
                     applyGifArtifacts(ctx, canvas.width, canvas.height, gifQuality);
-            }
+                }
 
-            const webpQuality = mapWebpValue(parseInt(sliders.webp.value)) / 100;
-            if (webpQuality < 1.0) {
+                const webpQuality = mapWebpValue(parseInt(sliders.webp.value)) / 100;
+                if (webpQuality < 1.0) {
                     const webpBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', webpQuality));
-                
+                    
                     if (webpBlob) {
-                const webpUrl = URL.createObjectURL(webpBlob);
-                const webpImg = new Image();
+                        const webpUrl = URL.createObjectURL(webpBlob);
+                        const webpImg = new Image();
                         webpImg.crossOrigin = 'anonymous';
                         
                         await new Promise((resolve, reject) => {
-                    webpImg.onload = resolve;
+                            webpImg.onload = resolve;
                             webpImg.onerror = reject;
-                    webpImg.src = webpUrl;
+                            webpImg.src = webpUrl;
                         }).catch(() => {});
-                
+                        
                         if (webpImg.complete && webpImg.naturalWidth > 0) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(webpImg, 0, 0);
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.drawImage(webpImg, 0, 0);
                         }
                         
                         URL.revokeObjectURL(webpUrl);
                     }
                 }
 
-            const targetWidth = 1000;
-            const aspectRatio = canvas.height / canvas.width;
-            const targetHeight = Math.round(targetWidth * aspectRatio);
-            
-            const finalCanvas = document.createElement('canvas');
-            const finalCtx = finalCanvas.getContext('2d');
-            finalCanvas.width = targetWidth;
-            finalCanvas.height = targetHeight;
-                finalCtx.imageSmoothingEnabled = false;
-            finalCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
-
-            const quality = mapQualityValue(parseInt(sliders.quality.value)) / 100;
+                const targetWidth = 1000;
+                const aspectRatio = canvas.height / canvas.width;
+                const targetHeight = Math.round(targetWidth * aspectRatio);
                 
-            finalCanvas.toBlob((blob) => {
+                const finalCanvas = document.createElement('canvas');
+                const finalCtx = finalCanvas.getContext('2d');
+                finalCanvas.width = targetWidth;
+                finalCanvas.height = targetHeight;
+                finalCtx.imageSmoothingEnabled = false;
+                finalCtx.drawImage(canvas, 0, 0, targetWidth, targetHeight);
+
+                const quality = mapQualityValue(parseInt(sliders.quality.value)) / 100;
+                
+                finalCanvas.toBlob((blob) => {
                     if (!blob) {
                         downloadBtn.disabled = false;
                         return;
@@ -931,16 +960,16 @@
                     if (currentImageUrl) URL.revokeObjectURL(currentImageUrl);
                     currentImageUrl = URL.createObjectURL(blob);
                     
-                const tempImg = new Image();
-                tempImg.onload = () => {
+                    const tempImg = new Image();
+                    tempImg.onload = () => {
                         previewImage.src = currentImageUrl;
                         downloadBtn.disabled = false;
-                };
+                    };
                     tempImg.onerror = () => {
                         downloadBtn.disabled = false;
                     };
                     tempImg.src = currentImageUrl;
-            }, 'image/jpeg', quality);
+                }, 'image/jpeg', quality);
             } catch (error) {
                 downloadBtn.disabled = false;
             }
