@@ -268,7 +268,7 @@
             text-transform: uppercase;
             color: var(--black-primary);
             pointer-events: none;
-            padding: 8px;
+            padding: 18px;
         }
         .top-left, .top-right { top: 0; }
         .bottom-left, .bottom-right { bottom: 0; }
@@ -420,16 +420,6 @@
             background: var(--black-primary);
         }
         
-        .preset-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .preset-button:disabled:hover {
-            background: var(--white-primary);
-            transform: none;
-        }
-
         .crop-container { position: relative; display: inline-block; }
         .crop-overlay { position: absolute; inset: 0; pointer-events: none; display: none; }
         .crop-overlay.active { display: block; pointer-events: auto; touch-action: none; }
@@ -907,8 +897,10 @@
         };
 
         const updateQualityControlPoint = () => {
-            qualityControlPoint.style.left = (qualityControlPosition.x * 100) + '%';
-            qualityControlPoint.style.top = ((1 - qualityControlPosition.y) * 100) + '%';
+            const clampedX = Math.max(0.036, Math.min(0.964, qualityControlPosition.x));
+            const clampedY = Math.max(0.036, Math.min(0.964, qualityControlPosition.y));
+            qualityControlPoint.style.left = (clampedX * 100) + '%';
+            qualityControlPoint.style.top = ((1 - clampedY) * 100) + '%';
         };
 
         const updateSlidersFromControl = () => {
@@ -966,12 +958,9 @@
         const updateReturnButton = () => {
             if (appliedCropData) {
                 returnToOriginal.innerHTML = '<i class="ri-fullscreen-line"></i><span>Original Crop</span>';
-                returnToOriginal.disabled = false;
                 cropPresetsWrapper.style.display = 'flex';
             } else {
-                returnToOriginal.innerHTML = '<i class="ri-check-line"></i><span>Default</span>';
-                returnToOriginal.disabled = true;
-                if (isMobile()) cropPresetsWrapper.style.display = 'none';
+                cropPresetsWrapper.style.display = 'none';
             }
         };
         
