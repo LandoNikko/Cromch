@@ -649,7 +649,7 @@
                     
             <div class="sliders-container">
                 <div class="panel-header">
-                    <h3 id="panelTitle">Edit Panel</h3>
+                    <h3 id="panelTitle">Edit Quality</h3>
                     <div class="crop-controls">
                         <button class="action-button" id="cropToggle">Crop</button>
                         <div class="crop-buttons" id="cropButtons" style="display: none;">
@@ -709,11 +709,11 @@
         <div class="modal-content">
             <div class="modal-header">About Cromch</div>
             <div class="modal-body">
-                <p>Cromch is a tool for embracing intentionally "bad" aesthetics.</p>
+                <p>Cromch is a tool for embracing intentionally "bad" aesthetics or to quickly optimize (and crop) an image.</p>
                 <br>
-                <p>Use the Quality Grid or Sliders to degrade your image with JPEG compression, WebP/GIF artifacts, and scaling.</p>
+                <p>A, B, C, D options represent JPEG, WebP, GIF and image scaling compression artifacts. Output is in JPG and fixed at 1000px width.</p>
                 <br>
-                <p>All processing happens in your browser.</p>
+                <p>All processing is local.</p>
             </div>
             <div class="modal-footer">
                 <button class="action-button" id="infoOkBtn">Close</button>
@@ -1146,7 +1146,7 @@
             cropBox.style.display = 'none';
             cropButtons.style.display = 'none';
             cropToggle.style.display = 'block';
-            panelTitle.textContent = 'Edit Panel';
+            panelTitle.textContent = 'Edit Quality';
             if (!isMobile()) qualitySlidersContainer.style.display = 'block';
             cropPresetsWrapper.style.display = 'none';
         };
